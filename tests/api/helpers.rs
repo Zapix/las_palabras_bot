@@ -11,10 +11,6 @@ impl TestApp {
         Ok(Self { port, api_client })
     }
 
-    pub fn port(&self) -> u16 {
-        self.port
-    }
-
     pub fn api_client(&self) -> &reqwest::Client {
         &self.api_client
     }

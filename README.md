@@ -85,3 +85,10 @@ Run the test suite to ensure everything is working correctly:
 cargo test
 ```
 
+### Git Hooks
+
+To ensure code quality, this project uses Git hooks for formatting and linting. Make sure to install the hooks after cloning the repository:
+```bash
+ln -s ./git-hooks/pre-commit .git/hooks/pre-commit
+```
+

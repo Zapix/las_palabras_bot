@@ -14,10 +14,30 @@ fi
 # Run rustfmt on them
 for file in $STAGED_FILES; do
   if [ -f "$file" ]; then
-    rustfmt "$file"
+    cargo fmt "$file"
     git add "$file"
   fi
 done
 
 echo "rustfmt completed."
 
+# Run Rust tests using nextest before committing
+echo "Running Rust tests with cargo nextest..."
+
+if ! command -v cargo-nextest >/dev/null 2>&1; then
+  echo "cargo-nextest not found. Please install it with:"
+  echo "  cargo install cargo-nextest"
+  exit 1
+fi
+
+cargo nextest run --no-fail-fast
+status=$?
+
+if [ $status -ne 0 ]; then
+  echo "Tests failed. Commit aborted."
+  exit $status
+else
+  echo "All tests passed."
+fi
+
+echo "Pre-commit checks passed. Proceeding with commit."
