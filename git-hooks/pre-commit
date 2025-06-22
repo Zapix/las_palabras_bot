@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Format Rust code before committing
+echo "Running rustfmt..."
+
+# Find all staged .rs files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.rs$')
+
+if [ -z "$STAGED_FILES" ]; then
+  echo "No Rust files to format."
+  exit 0
+fi
+
+# Run rustfmt on them
+for file in $STAGED_FILES; do
+  if [ -f "$file" ]; then
+    rustfmt "$file"
+    git add "$file"
+  fi
+done
+
+echo "rustfmt completed."
+

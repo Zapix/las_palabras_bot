@@ -1,6 +1,21 @@
 [package]
 name = "las_palabras_bot"
+description = "A Telegram bot for the Las Palabras game"
+authors = ["Aleksadnr Aibulatov<zap.aibualtov@gmail.com>"]
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "las_palabras_bot"
+path = "src/main.rs"
+
 [dependencies]
+tokio = { version = "1.45.1", features = ["full"] }
+actix-web = "4.11.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+anyhow = "1.0.98"
+thiserror = "2.0.12"
