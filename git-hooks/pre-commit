@@ -14,7 +14,7 @@ fi
 # Run rustfmt on them
 for file in $STAGED_FILES; do
   if [ -f "$file" ]; then
-    cargo fmt "$file"
+    rustfmt "$file"
     git add "$file"
   fi
 done
