@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 const LOCALHOST_HOST: &str = "127.0.0.1";
 
 pub struct TestApp {
@@ -21,12 +22,13 @@ impl TestApp {
 }
 
 pub async fn spawn_app() -> Result<TestApp, anyhow::Error> {
-    let app = las_palabras_bot::application::Application::new(
-        "0.1.0".to_string(),
-        LOCALHOST_HOST.to_string(),
-        0,
-    )
-    .map_err(|e| anyhow::anyhow!("Can not run server: {}", e))?;
+    dotenv().ok();
+    let mut settings = las_palabras_bot::configuration::Settings::load()
+        .map_err(|e| anyhow::anyhow!("Failed to load settings: {}", e))?;
+    settings.application.host = LOCALHOST_HOST.to_string();
+    settings.application.port = 0; // Use 0 to let the OS assign a free port
+    let app = las_palabras_bot::application::Application::new(settings)
+        .map_err(|e| anyhow::anyhow!("Can not run server: {}", e))?;
     let port = app.port();
     let _ = tokio::spawn(app.run_until_stopped());
 
