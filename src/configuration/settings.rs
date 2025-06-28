@@ -33,16 +33,16 @@ impl Settings {
             .expect("Failed to get current directory")
             .join("config");
 
-        let environtment =
+        let environment =
             std::env::var("APP_ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
         let version = env!("CARGO_PKG_VERSION");
-        let config_file = format!("{}.yaml", environtment);
+        let config_file = format!("{}.yaml", environment);
 
         let settings = Config::builder()
             .add_source(config::File::from(config_dir.join("base.yaml")))
             .add_source(config::File::from(config_dir.join(&config_file)))
             .add_source(config::Environment::with_prefix("APP"))
-            .set_override_option("environment", Some(environtment))?
+            .set_override_option("environment", Some(environment))?
             .set_override_option("version", Some(version))?
             .build()?;
 
