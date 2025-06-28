@@ -1,55 +1,30 @@
 use config::Config;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum AppEnvironment {
-    Development,
-    Production,
-}
-
-impl AppEnvironment {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            AppEnvironment::Development => "development",
-            AppEnvironment::Production => "production",
-        }
-    }
-}
-
-impl From<String> for AppEnvironment {
-    fn from(env: String) -> Self {
-        match env.as_str() {
-            "development" => AppEnvironment::Development,
-            "production" => AppEnvironment::Production,
-            _ => panic!("Unknown environment: {}", env),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TelegramSettings {
-    pub bot_token: String,
-}
-
-impl TelegramSettings {
-    pub fn new(bot_token: String) -> Self {
-        Self { bot_token }
-    }
-}
+use super::app_enviroment::AppEnvironment;
+use super::application_settings::ApplicationSettings;
+use super::telegram_settings::TelegramSettings;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Settings {
     pub version: String,
     environment: String,
-    telegram: TelegramSettings,
+    pub application: ApplicationSettings,
+    pub telegram: TelegramSettings,
 }
 
 impl Settings {
-    pub fn new(version: String, environment: String, telegram: TelegramSettings) -> Self {
+    pub fn new(
+        version: String,
+        environment: String,
+        application: ApplicationSettings,
+        telegram: TelegramSettings,
+    ) -> Self {
         Self {
             version,
             environment,
             telegram,
+            application,
         }
     }
 
@@ -66,6 +41,7 @@ impl Settings {
             .add_source(config::File::from(config_dir.join("base.yaml")))
             .add_source(config::File::from(config_dir.join(&config_file)))
             .add_source(config::Environment::with_prefix("APP"))
+            .set_override_option("environment", Some(environtment))?
             .build()?;
 
         settings.try_deserialize::<Settings>()
@@ -85,6 +61,7 @@ mod tests {
         let config = Settings::new(
             "1.0.0".to_string(),
             "development".to_string(),
+            ApplicationSettings::default(),
             TelegramSettings::new("your_bot_token".to_string()),
         );
         assert_eq!(config.version, "1.0.0");
@@ -96,6 +73,7 @@ mod tests {
         let config = Settings::new(
             "1.0.0".to_string(),
             "development".to_string(),
+            ApplicationSettings::default(),
             TelegramSettings::new("your_bot_token".to_string()),
         );
         assert_eq!(config.environment(), AppEnvironment::Development);
@@ -106,6 +84,7 @@ mod tests {
         let config = Settings::new(
             "1.0.0".to_string(),
             "production".to_string(),
+            ApplicationSettings::default(),
             TelegramSettings::new("your_bot_token".to_string()),
         );
         assert_eq!(config.environment(), AppEnvironment::Production);

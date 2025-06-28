@@ -4,6 +4,7 @@ use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
 
 use crate::api::health;
+use crate::configuration::Settings;
 
 pub struct Application {
     version: String,
@@ -13,9 +14,10 @@ pub struct Application {
 }
 
 impl Application {
-    pub fn new(version: String, host: String, port: u16) -> Result<Self, anyhow::Error> {
-        let address = TcpListener::bind((host.as_str(), port))
-            .map_err(|e| anyhow::anyhow!("Failed to bind to address: {}", e))?;
+    pub fn new(settings: Settings) -> Result<Self, anyhow::Error> {
+        let address =
+            TcpListener::bind((settings.application.host.clone(), settings.application.port))
+                .map_err(|e| anyhow::anyhow!("Failed to bind to address: {}", e))?;
 
         let port = address.local_addr().unwrap().port();
         let server = HttpServer::new(move || {
@@ -27,10 +29,14 @@ impl Application {
         .listen(address)?
         .run();
 
-        println!("Starting server at {}:{}", host, port);
+        println!(
+            "Starting server at {}:{}",
+            settings.application.host.clone(),
+            port
+        );
         Ok(Self {
-            version,
-            host,
+            version: settings.version.clone(),
+            host: settings.application.host.clone(),
             port,
             server,
         })
