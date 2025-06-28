@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 const LOCALHOST_HOST: &str = "127.0.0.1";
 
 pub struct TestApp {
@@ -21,6 +22,7 @@ impl TestApp {
 }
 
 pub async fn spawn_app() -> Result<TestApp, anyhow::Error> {
+    dotenv().ok();
     let mut settings = las_palabras_bot::configuration::Settings::load()
         .map_err(|e| anyhow::anyhow!("Failed to load settings: {}", e))?;
     settings.application.host = LOCALHOST_HOST.to_string();
