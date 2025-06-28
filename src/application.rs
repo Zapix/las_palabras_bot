@@ -3,7 +3,7 @@ use std::net::TcpListener;
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
 
-use crate::api::health;
+use crate::api::{health, info};
 use crate::configuration::Settings;
 
 pub struct Application {
@@ -19,24 +19,24 @@ impl Application {
             TcpListener::bind((settings.application.host.clone(), settings.application.port))
                 .map_err(|e| anyhow::anyhow!("Failed to bind to address: {}", e))?;
 
+        let version = settings.version.clone();
         let port = address.local_addr().unwrap().port();
+        let host = address.local_addr().unwrap().ip().to_string();
         let server = HttpServer::new(move || {
             App::new()
+                .app_data(web::Data::new(settings.clone()))
                 .route("/", web::get().to(|| async { "Hello, World!" }))
                 .route("/health", web::get().to(health))
+                .route("/info", web::get().to(info))
             // Here you can add your routes, middleware, etc.
         })
         .listen(address)?
         .run();
 
-        println!(
-            "Starting server at {}:{}",
-            settings.application.host.clone(),
-            port
-        );
+        println!("Starting server at {}:{}", host, port);
         Ok(Self {
-            version: settings.version.clone(),
-            host: settings.application.host.clone(),
+            version,
+            host,
             port,
             server,
         })
