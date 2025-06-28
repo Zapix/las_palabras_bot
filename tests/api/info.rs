@@ -16,8 +16,9 @@ async fn test_info() {
     );
 
     let body = response.text().await.expect("Failed to read response text");
+    let parsed: serde_json::Value = serde_json::from_str(&body).expect("Failed to parse JSON response");
     assert!(
-        body.contains("version"),
-        "Expected 'version' in response body"
+        parsed.get("version").is_some(),
+        "Expected 'version' field in JSON response"
     );
 }
