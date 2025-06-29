@@ -23,6 +23,6 @@ impl TryFrom<Data<Settings>> for Info {
 
 pub async fn info(settings: Data<Settings>) -> Result<HttpResponse, actix_web::Error> {
     let info =
-        Info::try_from(settings).map_err(|e| actix_web::error::ErrorInternalServerError(e))?;
+        Info::try_from(settings).map_err(actix_web::error::ErrorInternalServerError)?;
     Ok(HttpResponse::Ok().json(info))
 }

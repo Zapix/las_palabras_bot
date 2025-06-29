@@ -30,12 +30,10 @@ pub async fn spawn_app() -> Result<TestApp, anyhow::Error> {
     let app = las_palabras_bot::application::Application::new(settings)
         .map_err(|e| anyhow::anyhow!("Can not run server: {}", e))?;
     let port = app.port();
-    let _ = tokio::spawn(app.run_until_stopped());
+    tokio::spawn(app.run_until_stopped());
 
-    TestApp::new(port)
-        .map_err(|e| anyhow::anyhow!("Failed to create TestApp: {}", e))
-        .map(|test_app| {
-            println!("Test application running at: {}", test_app.address());
-            test_app
-        })
+    let test_app =
+        TestApp::new(port).map_err(|e| anyhow::anyhow!("Failed to create TestApp: {}", e))?;
+    println!("Test application running at: {}", test_app.address());
+    Ok(test_app)
 }
