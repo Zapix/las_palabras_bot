@@ -2,6 +2,7 @@ use std::net::TcpListener;
 
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
+use tracing_actix_web::TracingLogger;
 
 use crate::api::{health, info};
 use crate::configuration::Settings;
@@ -24,6 +25,7 @@ impl Application {
         let host = address.local_addr().unwrap().ip().to_string();
         let server = HttpServer::new(move || {
             App::new()
+                .wrap(TracingLogger::default())
                 .app_data(web::Data::new(settings.clone()))
                 .route("/", web::get().to(|| async { "Hello, World!" }))
                 .route("/health", web::get().to(health))
