@@ -1,6 +1,8 @@
 use actix_web::{web::Data, HttpResponse};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
+use tracing::info;
+use tracing_attributes::instrument;
 
 use crate::configuration::Settings;
 
@@ -21,7 +23,9 @@ impl TryFrom<Data<Settings>> for Info {
     }
 }
 
+#[instrument(err, skip(settings), fields(version = %settings.version))]
 pub async fn info(settings: Data<Settings>) -> Result<HttpResponse, actix_web::Error> {
+    info!(version = %settings.version, "print info about");
     let info =
         Info::try_from(settings).map_err(actix_web::error::ErrorInternalServerError)?;
     Ok(HttpResponse::Ok().json(info))

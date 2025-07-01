@@ -18,6 +18,14 @@ actix-web = "4.11.0"
 config = "0.15.11"
 dotenv = "0.15.0"
 envy = "0.4.2"
+env_logger = "0.11.5"
+log = "0.4.27"
+tracing = {  version = "0.1.41", features = ["log"] }
+tracing-attributes = { version = "0.1.30" }
+tracing-bunyan-formatter = "0.3.9"
+tracing-actix-web = "0.7.18"
+tracing-subscriber = {  version = "0.3.19", features = ["registry", "env-filter"] }
+tracing-log = "0.2.0"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 serde_yaml = "0.9.34"
