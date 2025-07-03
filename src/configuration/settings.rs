@@ -1,16 +1,18 @@
 use config::Config;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 
 use super::app_enviroment::AppEnvironment;
 use super::application_settings::ApplicationSettings;
 use super::telegram_settings::TelegramSettings;
+use super::database_settings::DatabaseSettings;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Settings {
     pub version: String,
     environment: String,
     pub application: ApplicationSettings,
     pub telegram: TelegramSettings,
+    pub database: DatabaseSettings
 }
 
 impl Settings {
@@ -19,12 +21,14 @@ impl Settings {
         environment: String,
         application: ApplicationSettings,
         telegram: TelegramSettings,
+        database: DatabaseSettings,
     ) -> Self {
         Self {
             version,
             environment,
             telegram,
             application,
+            database,
         }
     }
 
@@ -65,6 +69,14 @@ mod tests {
             "development".to_string(),
             ApplicationSettings::default(),
             TelegramSettings::new("your_bot_token".to_string()),
+            DatabaseSettings::new(
+                "user".to_string(),
+                "password".to_string(),
+                5432,
+                "localhost".to_string(),
+                "test_db".to_string(),
+                true,
+            ),
         );
         assert_eq!(config.version, "1.0.0");
         assert_eq!(config.environment, "development");
@@ -77,6 +89,14 @@ mod tests {
             "development".to_string(),
             ApplicationSettings::default(),
             TelegramSettings::new("your_bot_token".to_string()),
+            DatabaseSettings::new(
+                "user".to_string(),
+                "password".to_string(),
+                5432,
+                "localhost".to_string(),
+                "test_db".to_string(),
+                true,
+            ),
         );
         assert_eq!(config.environment(), AppEnvironment::Development);
     }
@@ -88,6 +108,14 @@ mod tests {
             "production".to_string(),
             ApplicationSettings::default(),
             TelegramSettings::new("your_bot_token".to_string()),
+            DatabaseSettings::new(
+                "user".to_string(),
+                "password".to_string(),
+                5432,
+                "localhost".to_string(),
+                "test_db".to_string(),
+                true,
+            ),
         );
         assert_eq!(config.environment(), AppEnvironment::Production);
     }
