@@ -8,12 +8,20 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-
 jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    services:
+      postgres:
+        # Docker Hub image
+        image: postgres:14
+        env:
+          POSTGRES_USER: example_user
+          POSTGRES_PASSWORD: example_password
+          POSTGRES_DB: example_db
+        ports:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v4
     - name: Build
