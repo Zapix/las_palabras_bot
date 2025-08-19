@@ -1,0 +1,52 @@
+use anyhow::{Error, Result};
+
+use crate::domain::vocabluary::raw_word::RawWord;
+use crate::domain::vocabluary::word::Word;
+
+use super::VocabluaryTrait;
+
+pub struct VocabluaryDb<'a> {
+    pool: &'a sqlx::PgPool,
+}
+
+impl<'a> VocabluaryDb<'a> {
+    pub fn new(pool: &'a sqlx::PgPool) -> Self {
+        Self { pool }
+    }
+}
+
+impl<'a> VocabluaryTrait for VocabluaryDb<'a> {
+    #[tracing::instrument(skip(self))]
+    async fn create_word(&self, raw_word: RawWord) -> Result<Word> {
+        sqlx::query_as!(
+            Word,
+            r#"
+            INSERT INTO "vocabulary" (spanish, russian, part_of_speech, is_verified, created_at, updated_at)
+            VALUES ($1, $2, $3, FALSE, NOW(), NOW())
+            RETURNING id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
+            "#r,
+            raw_word.spanish,
+            raw_word.russian,
+            raw_word.part_of_speech.as_str(),
+        ).fetch_one(self.pool)
+        .await
+        .map_err(Error::from)
+    }
+
+    async fn create_batch_words(&self, _raw_words: Vec<RawWord>) -> Result<Vec<Word>> {
+        todo!("Implement create batch words");
+    }
+
+    async fn get_word_by_id(&self, _id: uuid::Uuid) -> Result<Option<Word>> {
+        todo!("Implement create batch words");
+    }
+    async fn verify_word(&self, _id: uuid::Uuid) -> Result<Word> {
+        todo!("Implement create batch words");
+    }
+    async fn update_word(&self, _id: uuid::Uuid, _raw_word: RawWord) -> Result<Word> {
+        todo!("Implement create batch words");
+    }
+    async fn delete_word(&self, _id: uuid::Uuid) -> Result<()> {
+        todo!("Implement create batch words");
+    }
+}
