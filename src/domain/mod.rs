@@ -1,1 +1,1 @@
-pub mod vocabluary;
+pub mod vocabulary;

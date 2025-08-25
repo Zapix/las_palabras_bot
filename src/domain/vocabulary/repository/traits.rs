@@ -1,10 +1,10 @@
 use anyhow::Result;
 use std::future::Future;
 
-use crate::domain::vocabluary::raw_word::RawWord;
-use crate::domain::vocabluary::word::Word;
+use crate::domain::vocabulary::raw_word::RawWord;
+use crate::domain::vocabulary::word::Word;
 
-pub trait VocabluaryTrait {
+pub trait VocabularyTrait {
     fn create_word(&self, raw_word: RawWord) -> impl Future<Output = Result<Word>> + Send;
     fn create_batch_words(
         &self,

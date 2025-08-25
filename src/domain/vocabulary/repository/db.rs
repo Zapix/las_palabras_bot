@@ -1,21 +1,21 @@
 use anyhow::{Error, Result};
 
-use crate::domain::vocabluary::raw_word::RawWord;
-use crate::domain::vocabluary::word::Word;
+use crate::domain::vocabulary::raw_word::RawWord;
+use crate::domain::vocabulary::word::Word;
 
-use super::VocabluaryTrait;
+use super::VocabularyTrait;
 
-pub struct VocabluaryDb<'a> {
+pub struct VocabularyDb<'a> {
     pool: &'a sqlx::PgPool,
 }
 
-impl<'a> VocabluaryDb<'a> {
+impl<'a> VocabularyDb<'a> {
     pub fn new(pool: &'a sqlx::PgPool) -> Self {
         Self { pool }
     }
 }
 
-impl<'a> VocabluaryTrait for VocabluaryDb<'a> {
+impl<'a> VocabularyTrait for VocabularyDb<'a> {
     #[tracing::instrument(skip(self))]
     async fn create_word(&self, raw_word: RawWord) -> Result<Word> {
         sqlx::query_as!(
@@ -24,7 +24,7 @@ impl<'a> VocabluaryTrait for VocabluaryDb<'a> {
             INSERT INTO "vocabulary" (spanish, russian, part_of_speech, is_verified, created_at, updated_at)
             VALUES ($1, $2, $3, FALSE, NOW(), NOW())
             RETURNING id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
-            "#r,
+            "#,
             raw_word.spanish,
             raw_word.russian,
             raw_word.part_of_speech.as_str(),

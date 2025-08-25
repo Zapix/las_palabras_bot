@@ -2,9 +2,9 @@ use clap::Parser;
 
 use las_palabras_bot::application::get_connection_pool;
 use las_palabras_bot::configuration::Settings;
-use las_palabras_bot::domain::vocabluary::raw_word::RawWord;
-use las_palabras_bot::domain::vocabluary::repository::VocabluaryDb;
-use las_palabras_bot::domain::vocabluary::repository::VocabluaryTrait;
+use las_palabras_bot::domain::vocabulary::raw_word::RawWord;
+use las_palabras_bot::domain::vocabulary::repository::VocabularyDb;
+use las_palabras_bot::domain::vocabulary::repository::VocabularyTrait;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -33,7 +33,7 @@ async fn main() -> anyhow::Result<()> {
     println!("Adding word spanish word \"{}\"", raw_word.spanish);
     let settings = Settings::load().expect("Failed to load settings");
     let connection = get_connection_pool(&settings.database);
-    let vocabluary_db = VocabluaryDb::new(&connection);
+    let vocabluary_db = VocabularyDb::new(&connection);
     let word = vocabluary_db.create_word(raw_word).await?;
     println!("Added word: {:?}", word);
     Ok(())
