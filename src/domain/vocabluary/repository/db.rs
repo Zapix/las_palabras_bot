@@ -33,8 +33,33 @@ impl<'a> VocabluaryTrait for VocabluaryDb<'a> {
         .map_err(Error::from)
     }
 
-    async fn create_batch_words(&self, _raw_words: Vec<RawWord>) -> Result<Vec<Word>> {
-        todo!("Implement create batch words");
+    #[tracing::instrument(skip(self))]
+    async fn create_batch_words(&self, raw_words: Vec<RawWord>) -> Result<Vec<Word>> {
+        let mut query_builder: sqlx::QueryBuilder<sqlx::Postgres> = sqlx::QueryBuilder::new(
+            r#"
+            INSERT INTO "vocabulary" (spanish, russian, part_of_speech, is_verified, created_at, updated_at)
+            "#,
+        );
+
+        query_builder.push_values(raw_words.iter(), |mut b, raw_word| {
+            b.push_bind(&raw_word.spanish)
+                .push_bind(&raw_word.russian)
+                .push_bind(raw_word.part_of_speech.as_str())
+                .push_bind(false) // is_verified
+                .push_bind(sqlx::types::chrono::Utc::now()) // created_at
+                .push_bind(sqlx::types::chrono::Utc::now()); // updated_at
+        });
+
+        query_builder.push(
+            r#"
+            RETURNING id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
+            "#,
+        );
+
+        let query = query_builder.build_query_as::<Word>();
+        let words = query.fetch_all(self.pool).await.map_err(Error::from)?;
+
+        Ok(words)
     }
 
     async fn get_word_by_id(&self, _id: uuid::Uuid) -> Result<Option<Word>> {

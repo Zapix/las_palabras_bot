@@ -2,7 +2,10 @@ use clap::Parser;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
+use las_palabras_bot::application::get_connection_pool;
+use las_palabras_bot::configuration::Settings;
 use las_palabras_bot::domain::vocabluary::raw_word::RawWord;
+use las_palabras_bot::domain::vocabluary::repository::{VocabluaryDb, VocabluaryTrait};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -23,5 +26,17 @@ async fn main() -> anyhow::Result<()> {
         .map_err(|e| anyhow::anyhow!("Failed to parse JSON: {}", e))?;
 
     println!("Parsed {} words from the vocabulary file.", content.len());
+
+    let settings = Settings::load().expect("Failed to load settings");
+    let connection = get_connection_pool(&settings.database);
+    let vocabluary_db = VocabluaryDb::new(&connection);
+
+    let new_words = vocabluary_db.create_batch_words(content).await?;
+
+    for (i, word) in new_words.iter().enumerate() {
+        println!("{}. {:?}", i + 1, word);
+    }
+
+    println!("Saved {} words into db", new_words.len());
     Ok(())
 }
