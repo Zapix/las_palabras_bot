@@ -1,0 +1,60 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO \"vocabulary\" (spanish, russian, part_of_speech, is_verified, created_at, updated_at)\n            VALUES ($1, $2, $3, FALSE, NOW(), NOW())\n            RETURNING id, spanish, russian, part_of_speech, is_verified, created_at, updated_at\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "spanish",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "russian",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "part_of_speech",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "is_verified",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7e5508cbdfbf916997973331a0a52ccfd0a98a775d1de809c8324f7e96dbd6a1"
+}
