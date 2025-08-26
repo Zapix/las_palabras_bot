@@ -1,14 +1,14 @@
 use std::net::TcpListener;
 
 use actix_web::dev::Server;
-use actix_web::{web, App, HttpServer};
-use sqlx::postgres::PgPoolOptions;
+use actix_web::{App, HttpServer, web};
 use sqlx::PgPool;
+use sqlx::postgres::PgPoolOptions;
 use tracing_actix_web::TracingLogger;
 
-use crate::api::{health, info};
-use crate::configuration::database_settings::DatabaseSettings;
+use crate::api::{health, info, vocabulary};
 use crate::configuration::Settings;
+use crate::configuration::database_settings::DatabaseSettings;
 
 pub struct Application {
     version: String,
@@ -36,6 +36,9 @@ impl Application {
                 .route("/", web::get().to(|| async { "Hello, World!" }))
                 .route("/health", web::get().to(health))
                 .route("/info", web::get().to(info))
+                .service(web::scope("/api/v1").service(
+                    web::scope("/vocabulary").route("", web::get().to(vocabulary::list_words)),
+                ))
             // Here you can add your routes, middleware, etc.
         })
         .listen(address)?
@@ -69,9 +72,9 @@ impl Application {
     }
 }
 
-
 pub fn get_connection_pool(db_settings: &DatabaseSettings) -> PgPool {
     PgPoolOptions::new()
         .max_connections(5)
         .connect_lazy_with(db_settings.with_db_name())
 }
+

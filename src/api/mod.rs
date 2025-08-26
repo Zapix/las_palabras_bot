@@ -1,9 +1,12 @@
+use actix_web::web;
 use anyhow::Result;
 use sqlx::PgPool;
-use actix_web::{web};
-use tracing_attributes::instrument;
 use tracing::info;
+use tracing_attributes::instrument;
+
 mod info;
+mod pagination;
+pub mod vocabulary;
 pub use info::info;
 
 #[instrument(name = "health_check", skip(db_pool), err)]
