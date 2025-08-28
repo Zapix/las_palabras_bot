@@ -17,7 +17,7 @@ pub async fn list_words(
     let words_count = vocabulary_repo
         .count_words()
         .await
-        .map_err(|_e| error::ErrorInternalServerError("Can get words count from db"))?;
+        .map_err(|_e| error::ErrorInternalServerError("Cannot get words count from db"))?;
 
     let items = vocabulary_repo
         .list_word(page, per_page)
