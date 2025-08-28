@@ -6,16 +6,26 @@ use crate::domain::vocabulary::word::Word;
 
 pub trait VocabularyTrait {
     fn create_word(&self, raw_word: RawWord) -> impl Future<Output = Result<Word>> + Send;
+
     fn create_batch_words(
         &self,
         raw_words: Vec<RawWord>,
     ) -> impl Future<Output = Result<Vec<Word>>> + Send;
+
+    fn list_word(&self, page: u64, per_page: u64)
+    -> impl Future<Output = Result<Vec<Word>>> + Send;
+
+    fn count_words(&self) -> impl Future<Output = Result<i64>> + Send;
+
     fn get_word_by_id(&self, id: uuid::Uuid) -> impl Future<Output = Result<Option<Word>>> + Send;
+
     fn verify_word(&self, id: uuid::Uuid) -> impl Future<Output = Result<Word>> + Send;
+
     fn update_word(
         &self,
         id: uuid::Uuid,
         raw_word: RawWord,
     ) -> impl Future<Output = Result<Word>> + Send;
+
     fn delete_word(&self, id: uuid::Uuid) -> impl Future<Output = Result<()>> + Send;
 }

@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, serde::Serialize)]
+pub const DEFAULT_PAGE: u64 = 20;
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[allow(dead_code)]
 pub struct Pagination<T>
 where

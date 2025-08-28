@@ -5,7 +5,7 @@ use tracing::info;
 use tracing_attributes::instrument;
 
 mod info;
-mod pagination;
+pub mod pagination;
 pub mod vocabulary;
 pub use info::info;
 
