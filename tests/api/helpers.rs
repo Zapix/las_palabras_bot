@@ -1,22 +1,27 @@
 use dotenv::dotenv;
-use sqlx::Connection;
-use sqlx::PgConnection;
-use uuid::Uuid;
-use log::info;
+use las_palabras_bot::application::get_connection_pool;
 use las_palabras_bot::configuration::DatabaseSettings;
+use log::info;
 use secrecy::ExposeSecret;
+use sqlx::{Connection, PgConnection, PgPool};
+use uuid::Uuid;
 
 const LOCALHOST_HOST: &str = "127.0.0.1";
 
 pub struct TestApp {
     port: u16,
     api_client: reqwest::Client,
+    db_pool: PgPool,
 }
 
 impl TestApp {
-    pub fn new(port: u16) -> Result<Self, anyhow::Error> {
+    pub fn new(port: u16, db_pool: PgPool) -> Result<Self, anyhow::Error> {
         let api_client = reqwest::Client::builder().build()?;
-        Ok(Self { port, api_client })
+        Ok(Self {
+            port,
+            api_client,
+            db_pool,
+        })
     }
 
     pub fn api_client(&self) -> &reqwest::Client {
@@ -25,6 +30,10 @@ impl TestApp {
 
     pub fn address(&self) -> String {
         format!("http://{}:{}", LOCALHOST_HOST, self.port)
+    }
+
+    pub fn db_pool(&mut self) -> &mut PgPool {
+        &mut self.db_pool
     }
 }
 
@@ -35,7 +44,7 @@ pub async fn configure_database(db_settings: &mut DatabaseSettings) -> Result<()
         db_settings.port,
         db_settings.host.clone(),
         "postgres".to_string(), // Use the default postgres database for maintenance
-        db_settings.require_ssl
+        db_settings.require_ssl,
     );
     let mut connection = PgConnection::connect_with(&maintenance_settings.with_db_name())
         .await
@@ -46,6 +55,13 @@ pub async fn configure_database(db_settings: &mut DatabaseSettings) -> Result<()
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create database: {}", e))?;
     db_settings.database_name = database_name;
+    let mut connection = PgConnection::connect_with(&db_settings.with_db_name())
+        .await
+        .map_err(|e| anyhow::anyhow!("Failed to connect to new database: {}", e))?;
+    sqlx::migrate!("./migrations")
+        .run(&mut connection)
+        .await
+        .map_err(|e| anyhow::anyhow!("Failed to run migrations: {}", e))?;
     Ok(())
 }
 
@@ -57,6 +73,7 @@ pub async fn spawn_app() -> Result<TestApp, anyhow::Error> {
         .await
         .map_err(|e| anyhow::anyhow!("Failed to configure database: {}", e))?;
     info!("Database configured with settings: {:?}", settings.database);
+    let db_settings = settings.database.clone();
     settings.application.host = LOCALHOST_HOST.to_string();
     settings.application.port = 0; // Use 0 to let the OS assign a free port
     let app = las_palabras_bot::application::Application::new(settings)
@@ -64,8 +81,9 @@ pub async fn spawn_app() -> Result<TestApp, anyhow::Error> {
     let port = app.port();
     tokio::spawn(app.run_until_stopped());
 
-    let test_app =
-        TestApp::new(port).map_err(|e| anyhow::anyhow!("Failed to create TestApp: {}", e))?;
+    let db_pool = get_connection_pool(&db_settings);
+    let test_app = TestApp::new(port, db_pool)
+        .map_err(|e| anyhow::anyhow!("Failed to create TestApp: {}", e))?;
     info!("Test application running at: {}", test_app.address());
     Ok(test_app)
 }

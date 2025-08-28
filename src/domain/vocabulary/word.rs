@@ -2,8 +2,9 @@ use super::part_of_speech::PartOfSpeech;
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, PartialEq, Eq, sqlx::FromRow)]
+#[derive(Debug, Clone, PartialEq, Eq, sqlx::FromRow, serde::Serialize, serde::Deserialize)]
 pub struct Word {
+    #[serde(with = "uuid::serde::simple")]
     pub id: Uuid,
     pub spanish: String,
     pub russian: String,

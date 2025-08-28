@@ -62,6 +62,37 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
         Ok(words)
     }
 
+    #[tracing::instrument(skip(self))]
+    async fn list_word(&self, page: u64, per_page: u64) -> Result<Vec<Word>> {
+        sqlx::query_as!(
+            Word,
+            r#"
+                SELECT id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
+                FROM "vocabulary"
+                ORDER BY created_at DESC
+                OFFSET $1 LIMIT $2
+            "#,
+            (page * per_page) as i64,
+            per_page as i64
+        )
+        .fetch_all(self.pool)
+        .await
+        .map_err(Error::from)
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn count_words(&self) -> Result<i64> {
+        sqlx::query_scalar!(
+            r#"
+                SELECT COUNT(*) as "count!"
+                FROM "vocabulary"
+            "#
+        )
+        .fetch_one(self.pool)
+        .await
+        .map_err(Error::from)
+    }
+
     async fn get_word_by_id(&self, _id: uuid::Uuid) -> Result<Option<Word>> {
         todo!("Implement create batch words");
     }
