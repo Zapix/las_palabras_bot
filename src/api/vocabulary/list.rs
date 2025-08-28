@@ -22,7 +22,7 @@ pub async fn list_words(
     let items = vocabulary_repo
         .list_word(page, per_page)
         .await
-        .map_err(|_e| error::ErrorInternalServerError("Can get words from db"))?;
+        .map_err(|_e| error::ErrorInternalServerError("Cannot get words from db"))?;
 
     Ok(HttpResponse::Ok().json(Pagination {
         page,
