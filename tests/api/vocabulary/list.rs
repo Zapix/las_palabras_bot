@@ -10,8 +10,8 @@ async fn test_list() {
 
     let db_pool = app.db_pool();
     println!("Database pool info: {:?}", db_pool.connect_options());
-    let vocabluary_db = VocabularyDb::new(db_pool);
-    vocabluary_db
+    let vocabulary_db = VocabularyDb::new(db_pool);
+    vocabulary_db
         .create_batch_words(vec![
             RawWord {
                 spanish: "hola".into(),
