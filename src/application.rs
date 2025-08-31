@@ -36,9 +36,13 @@ impl Application {
                 .route("/", web::get().to(|| async { "Hello, World!" }))
                 .route("/health", web::get().to(health))
                 .route("/info", web::get().to(info))
-                .service(web::scope("/api/v1").service(
-                    web::scope("/vocabulary").route("", web::get().to(vocabulary::list_words)),
-                ))
+                .service(
+                    web::scope("/api/v1").service(
+                        web::resource("/vocabulary")
+                            .route(web::get().to(vocabulary::list_words))
+                            .route(web::post().to(vocabulary::create_word)),
+                    ),
+                )
             // Here you can add your routes, middleware, etc.
         })
         .listen(address)?
@@ -77,4 +81,3 @@ pub fn get_connection_pool(db_settings: &DatabaseSettings) -> PgPool {
         .max_connections(5)
         .connect_lazy_with(db_settings.with_db_name())
 }
-
