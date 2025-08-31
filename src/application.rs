@@ -37,11 +37,16 @@ impl Application {
                 .route("/health", web::get().to(health))
                 .route("/info", web::get().to(info))
                 .service(
-                    web::scope("/api/v1").service(
-                        web::resource("/vocabulary")
-                            .route(web::get().to(vocabulary::list_words))
-                            .route(web::post().to(vocabulary::create_word)),
-                    ),
+                    web::scope("/api/v1")
+                        .service(
+                            web::resource("/vocabulary")
+                                .route(web::get().to(vocabulary::list_words))
+                                .route(web::post().to(vocabulary::create_word)),
+                        )
+                        .service(
+                            web::resource("/vocabulary/{id}")
+                                .route(web::get().to(vocabulary::get_word)),
+                        ),
                 )
             // Here you can add your routes, middleware, etc.
         })
