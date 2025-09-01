@@ -111,8 +111,23 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
     async fn verify_word(&self, _id: uuid::Uuid) -> Result<Word> {
         todo!("Implement create batch words");
     }
-    async fn update_word(&self, _id: uuid::Uuid, _raw_word: RawWord) -> Result<Word> {
-        todo!("Implement create batch words");
+    async fn update_word(&self, id: uuid::Uuid, raw_word: RawWord) -> Result<Word> {
+        sqlx::query_as!(
+            Word,
+            r#"
+            UPDATE "vocabulary"
+            SET spanish = $1, russian = $2, part_of_speech = $3,  updated_at = NOW()
+            WHERE id = $4
+            RETURNING id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
+            "#,
+            raw_word.spanish,
+            raw_word.russian,
+            raw_word.part_of_speech.as_str(),
+            id
+        )
+            .fetch_one(self.pool)
+            .await
+            .map_err(Error::from)
     }
     async fn delete_word(&self, _id: uuid::Uuid) -> Result<()> {
         todo!("Implement create batch words");
