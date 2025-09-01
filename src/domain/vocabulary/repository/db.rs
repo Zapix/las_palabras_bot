@@ -93,9 +93,21 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
         .map_err(Error::from)
     }
 
-    async fn get_word_by_id(&self, _id: uuid::Uuid) -> Result<Option<Word>> {
-        todo!("Implement create batch words");
+    async fn get_word_by_id(&self, id: uuid::Uuid) -> Result<Option<Word>> {
+        sqlx::query_as!(
+            Word,
+            r#"
+            SELECT id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
+            FROM "vocabulary"
+            WHERE id = $1
+            "#,
+            id
+        )
+        .fetch_optional(self.pool)
+        .await
+        .map_err(Error::from)
     }
+
     async fn verify_word(&self, _id: uuid::Uuid) -> Result<Word> {
         todo!("Implement create batch words");
     }
