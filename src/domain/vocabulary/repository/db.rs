@@ -116,13 +116,14 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
             Word,
             r#"
             UPDATE "vocabulary"
-            SET spanish = $1, russian = $2, part_of_speech = $3,  updated_at = NOW()
-            WHERE id = $4
+            SET spanish = $1, russian = $2, part_of_speech = $3, is_verified = $4, updated_at = NOW()
+            WHERE id = $5
             RETURNING id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
             "#,
             raw_word.spanish,
             raw_word.russian,
             raw_word.part_of_speech.as_str(),
+            raw_word.is_verified.unwrap_or(false),
             id
         )
             .fetch_one(self.pool)

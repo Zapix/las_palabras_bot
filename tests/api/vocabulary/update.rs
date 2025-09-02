@@ -29,6 +29,7 @@ async fn update_word_succeeds_for_existing_word() {
         spanish: "test_word".into(),
         part_of_speech: "noun".into(),
         russian: "тестовое_слово".into(),
+        is_verified: Some(false),
     };
     let db_pool = app.db_pool();
     let vocabulary_db = VocabularyDb::new(db_pool);
@@ -64,4 +65,51 @@ async fn update_word_succeeds_for_existing_word() {
     assert_eq!(updated_word.spanish, "updated_word");
     assert_eq!(updated_word.part_of_speech, "verb".into());
     assert_eq!(updated_word.russian, "обновленное_слово");
+}
+
+#[tokio::test]
+async fn update_word_verified_through_patch() {
+    let mut app = spawn_app().await.expect("Failed to spawn app");
+    let new_word = RawWord {
+        spanish: "test_word".into(),
+        part_of_speech: "noun".into(),
+        russian: "тестовое_слово".into(),
+        is_verified: Some(false),
+    };
+    let db_pool = app.db_pool();
+    let vocabulary_db = VocabularyDb::new(db_pool);
+    let created_word = vocabulary_db
+        .create_word(new_word)
+        .await
+        .expect("Failed to create word");
+
+    assert!(!created_word.is_verified);
+    let patch = serde_json::json!({
+        "is_verified": true
+    });
+
+    let client = reqwest::Client::new();
+    let response = client
+        .patch(format!(
+            "{}/api/v1/vocabulary/{}",
+            &app.address(),
+            created_word.id
+        ))
+        .header("Content-Type", "application/json")
+        .json(&patch)
+        .send()
+        .await
+        .expect("Failed to execute request.");
+
+    assert!(
+        response.status().is_success(),
+        "Expected a successful response"
+    );
+    let updated_word: Word = response
+        .json()
+        .await
+        .expect("Failed to parse response JSON.");
+
+    assert_eq!(updated_word.id, created_word.id);
+    assert!(updated_word.is_verified);
 }

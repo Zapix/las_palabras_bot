@@ -23,6 +23,7 @@ impl From<Args> for RawWord {
             spanish: args.spanish,
             part_of_speech: args.part_of_speech.into(),
             russian: args.russian,
+            is_verified: Some(false),
         }
     }
 }

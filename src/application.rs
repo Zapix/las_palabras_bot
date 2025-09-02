@@ -46,7 +46,8 @@ impl Application {
                         .service(
                             web::resource("/vocabulary/{id}")
                                 .route(web::get().to(vocabulary::get_word))
-                                .route(web::put().to(vocabulary::update_word)),
+                                .route(web::put().to(vocabulary::update_word))
+                                .route(web::patch().to(vocabulary::update_word)),
                         ),
                 )
             // Here you can add your routes, middleware, etc.
