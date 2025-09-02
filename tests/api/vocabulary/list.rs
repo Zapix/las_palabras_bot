@@ -17,11 +17,13 @@ async fn test_list() {
                 spanish: "hola".into(),
                 part_of_speech: "noun".into(),
                 russian: "привет".into(),
+                is_verified: Some(false),
             },
             RawWord {
                 spanish: "adiós".into(),
                 part_of_speech: "noun".into(),
                 russian: "прощай".into(),
+                is_verified: Some(false),
             },
         ])
         .await

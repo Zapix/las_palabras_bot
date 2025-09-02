@@ -41,6 +41,7 @@ pub struct UpdateVocabularyData {
     spanish: Option<String>,
     russian: Option<String>,
     part_of_speech: Option<String>,
+    is_verified: Option<bool>,
 }
 
 impl UpdateVocabularyData {
@@ -60,6 +61,7 @@ impl UpdateVocabularyData {
                 .clone()
                 .unwrap_or_else(|| existing.part_of_speech.as_str().to_string())
                 .into(),
+            is_verified: Some(self.is_verified.unwrap_or(existing.is_verified)),
         }
     }
 }

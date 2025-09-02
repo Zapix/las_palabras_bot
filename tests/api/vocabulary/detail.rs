@@ -27,6 +27,7 @@ async fn test_detail_word() {
             spanish: "perro".into(),
             part_of_speech: "noun".into(),
             russian: "собака".into(),
+            is_verified: Some(false),
         })
         .await
         .expect("Failed to create word");
