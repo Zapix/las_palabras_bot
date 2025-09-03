@@ -1,0 +1,24 @@
+use actix_web::{web, HttpResponse, Responder, Error as ActixError};
+use sqlx::PgPool;
+use crate::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
+use super::detail_word_error::DetailWordError;
+
+#[tracing::instrument(name = "delete_word" skip(db_pool))]
+pub async fn delete_word(
+    db_pool: web::Data<PgPool>,
+    path: web::Path<uuid::Uuid>,
+) -> Result<impl Responder, ActixError> {
+    let vocabulary_repo = VocabularyDb::new(db_pool.as_ref());
+    vocabulary_repo
+        .get_word_by_id(*path)
+        .await
+        .map_err(DetailWordError::from)?
+        .ok_or_else(DetailWordError::not_found)?;
+
+    vocabulary_repo
+        .delete_word(*path)
+        .await
+        .map_err(DetailWordError::from)?;
+
+    Ok(HttpResponse::NoContent().finish())
+}
