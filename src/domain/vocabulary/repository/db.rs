@@ -130,7 +130,18 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
             .await
             .map_err(Error::from)
     }
-    async fn delete_word(&self, _id: uuid::Uuid) -> Result<()> {
-        todo!("Implement create batch words");
+    async fn delete_word(&self, id: uuid::Uuid) -> Result<()> {
+        sqlx::query!(
+            r#"
+            DELETE FROM "vocabulary"
+            WHERE id = $1
+            "#,
+            id
+        )
+        .execute(self.pool)
+        .await
+        .map_err(Error::from)?;
+
+        Ok(())
     }
 }
