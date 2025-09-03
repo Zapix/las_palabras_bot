@@ -3,7 +3,7 @@ use anyhow::{Error, Result};
 use crate::domain::vocabulary::raw_word::RawWord;
 use crate::domain::vocabulary::word::Word;
 
-use super::VocabularyTrait;
+use super::{IsVerifiedFilter, VocabularyTrait};
 
 pub struct VocabularyDb<'a> {
     pool: &'a sqlx::PgPool,
@@ -63,15 +63,23 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn list_word(&self, page: u64, per_page: u64) -> Result<Vec<Word>> {
+    async fn list_word(&self, page: u64, per_page: u64, filter: IsVerifiedFilter) -> Result<Vec<Word>> {
+        let filter = match filter {
+            IsVerifiedFilter::Any => vec![true, false],
+            IsVerifiedFilter::True => vec![true],
+            IsVerifiedFilter::False => vec![false],
+        };
+
         sqlx::query_as!(
             Word,
             r#"
                 SELECT id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
                 FROM "vocabulary"
+                WHERE is_verified = ANY($1)
                 ORDER BY created_at DESC
-                OFFSET $1 LIMIT $2
+                OFFSET $2 LIMIT $3
             "#,
+            &filter,
             (page * per_page) as i64,
             per_page as i64
         )
