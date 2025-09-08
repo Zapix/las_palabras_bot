@@ -18,4 +18,5 @@ async fn test_health() {
         response.text().await.expect("Failed to read response text"),
         "Expected 'OK' in response body"
     );
+    let _ = app.drop_database().await;
 }

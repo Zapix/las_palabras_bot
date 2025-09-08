@@ -21,4 +21,5 @@ async fn test_info() {
         parsed.get("version").is_some(),
         "Expected 'version' field in JSON response"
     );
+    let _ = app.drop_database().await;
 }

@@ -16,6 +16,7 @@ async fn delete_word_returns_404_for_non_existing_word() {
         .await
         .expect("Failed to execute request.");
     assert_eq!(response.status().as_u16(), 404);
+    let _ = app.drop_database().await;
 }
 
 #[tokio::test]
@@ -52,4 +53,5 @@ async fn delete_word_succeeds_for_existing_word() {
         StatusCode::NO_CONTENT,
         "Expected 204 No Content status"
     );
+    let _ = app.drop_database().await;
 }

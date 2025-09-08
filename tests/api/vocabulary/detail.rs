@@ -14,6 +14,7 @@ async fn test_detail_404_error() {
         .await
         .expect("Failed to send request");
     assert_eq!(response.status().as_u16(), 404);
+    let _ = app.drop_database().await;
 }
 
 #[tokio::test]
@@ -55,4 +56,5 @@ async fn test_detail_word() {
     assert_eq!(word.spanish, "perro");
     assert_eq!(word.russian, "собака");
     assert_eq!(word.part_of_speech, "noun".into());
+    let _ = app.drop_database().await;
 }

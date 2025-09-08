@@ -51,6 +51,7 @@ async fn test_list() {
         data.items.iter().any(|w| w.spanish == "hola"),
         "Expected to find the word 'hola'"
     );
+    let _ = app.drop_database().await;
 }
 
 #[tokio::test]
@@ -103,6 +104,7 @@ async fn test_list_with_verified_filter() {
         data.items.iter().all(|w| w.is_verified),
         "Expected all words to be verified"
     );
+    let _ = app.drop_database().await;
 }
 
 #[tokio::test]
@@ -158,4 +160,5 @@ async fn test_list_with_unverified_filter() {
         data.items.iter().all(|w| !w.is_verified),
         "Expected all words to be unverified"
     );
+    let _ = app.drop_database().await;
 }

@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 use las_palabras_bot::application::get_connection_pool;
-use las_palabras_bot::configuration::DatabaseSettings;
+use las_palabras_bot::configuration::{Settings, DatabaseSettings};
 use log::info;
 use secrecy::ExposeSecret;
 use sqlx::{Connection, PgConnection, PgPool};
@@ -12,15 +12,17 @@ pub struct TestApp {
     port: u16,
     api_client: reqwest::Client,
     db_pool: PgPool,
+    settings: Settings,
 }
 
 impl TestApp {
-    pub fn new(port: u16, db_pool: PgPool) -> Result<Self, anyhow::Error> {
+    pub fn new(port: u16, db_pool: PgPool, settings: Settings) -> Result<Self, anyhow::Error> {
         let api_client = reqwest::Client::builder().build()?;
         Ok(Self {
             port,
             api_client,
             db_pool,
+            settings,
         })
     }
 
@@ -35,9 +37,32 @@ impl TestApp {
     pub fn db_pool(&mut self) -> &mut PgPool {
         &mut self.db_pool
     }
+
+    pub async fn drop_database(&self) -> Result<(), anyhow::Error> {
+        let mut connection = get_db_maintenance_connection(&self.settings.database)
+            .await
+            .map_err(|e| anyhow::anyhow!("Failed to get maintenance connection: {}", e))?;
+        sqlx::query(
+            format!(
+                "DROP DATABASE IF EXISTS {} WITH (FORCE);",
+                self.settings.database.database_name
+            )
+                .as_str(),
+        )
+            .execute(&mut connection)
+            .await
+            .map_err(|e| anyhow::anyhow!("Failed to drop test database: {}", e))?;
+        info!(
+            "Test database {} dropped",
+            self.settings.database.database_name
+        );
+        Ok(())
+    }
 }
 
-pub async fn configure_database(db_settings: &mut DatabaseSettings) -> Result<(), anyhow::Error> {
+async fn get_db_maintenance_connection(
+    db_settings: &DatabaseSettings,
+) -> Result<PgConnection, anyhow::Error> {
     let maintenance_settings = DatabaseSettings::new(
         db_settings.username.clone(),
         db_settings.password.expose_secret().to_string(),
@@ -46,9 +71,14 @@ pub async fn configure_database(db_settings: &mut DatabaseSettings) -> Result<()
         "postgres".to_string(), // Use the default postgres database for maintenance
         db_settings.require_ssl,
     );
-    let mut connection = PgConnection::connect_with(&maintenance_settings.with_db_name())
+    let connection = PgConnection::connect_with(&maintenance_settings.with_db_name())
         .await
         .map_err(|e| anyhow::anyhow!("Failed to connect to postgres: {}", e))?;
+    Ok(connection)
+}
+
+pub async fn configure_database(db_settings: &mut DatabaseSettings) -> Result<(), anyhow::Error> {
+    let mut connection = get_db_maintenance_connection(db_settings).await?;
     let database_name = format!("test_{}", Uuid::new_v4().to_string().replace("-", "_"));
     sqlx::query(format!("CREATE DATABASE {};", database_name.as_str()).as_str())
         .execute(&mut connection)
@@ -76,13 +106,13 @@ pub async fn spawn_app() -> Result<TestApp, anyhow::Error> {
     let db_settings = settings.database.clone();
     settings.application.host = LOCALHOST_HOST.to_string();
     settings.application.port = 0; // Use 0 to let the OS assign a free port
-    let app = las_palabras_bot::application::Application::new(settings)
+    let app = las_palabras_bot::application::Application::new(settings.clone())
         .map_err(|e| anyhow::anyhow!("Can not run server: {}", e))?;
     let port = app.port();
     tokio::spawn(app.run_until_stopped());
 
     let db_pool = get_connection_pool(&db_settings);
-    let test_app = TestApp::new(port, db_pool)
+    let test_app = TestApp::new(port, db_pool, settings)
         .map_err(|e| anyhow::anyhow!("Failed to create TestApp: {}", e))?;
     info!("Test application running at: {}", test_app.address());
     Ok(test_app)
