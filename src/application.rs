@@ -1,5 +1,6 @@
 use std::net::TcpListener;
 
+use actix_cors::Cors;
 use actix_web::dev::Server;
 use actix_web::{App, HttpServer, web};
 use sqlx::PgPool;
@@ -30,6 +31,7 @@ impl Application {
         let host = address.local_addr()?.ip().to_string();
         let server = HttpServer::new(move || {
             App::new()
+                .wrap(get_cors_middleware())
                 .wrap(TracingLogger::default())
                 .app_data(web::Data::new(settings.clone()))
                 .app_data(web::Data::new(connection_pool.clone()))
@@ -88,4 +90,12 @@ pub fn get_connection_pool(db_settings: &DatabaseSettings) -> PgPool {
     PgPoolOptions::new()
         .max_connections(5)
         .connect_lazy_with(db_settings.with_db_name())
+}
+
+fn get_cors_middleware() -> Cors {
+    Cors::default()
+        .allow_any_origin()
+        .allow_any_method()
+        .allow_any_header()
+        .max_age(3600)
 }
