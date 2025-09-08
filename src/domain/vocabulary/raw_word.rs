@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::part_of_speech::PartOfSpeech;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct RawWord {
     pub spanish: String,
     pub russian: String,

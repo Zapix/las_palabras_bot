@@ -1,9 +1,9 @@
-mod create;
-mod detail;
-mod list;
-mod update;
-mod detail_word_error;
-mod delete;
+pub mod create;
+pub mod detail;
+pub mod list;
+pub mod update;
+pub mod detail_word_error;
+pub mod delete;
 
 pub use create::create_word;
 pub use detail::get_word;

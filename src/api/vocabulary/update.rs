@@ -5,7 +5,7 @@ use crate::domain::vocabulary::word::Word;
 use crate::domain::vocabulary::raw_word::RawWord;
 use super::detail_word_error::DetailWordError;
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(serde::Deserialize, Debug, utoipa::ToSchema)]
 pub struct UpdateVocabularyData {
     spanish: Option<String>,
     russian: Option<String>,
@@ -36,6 +36,20 @@ impl UpdateVocabularyData {
 }
 
 #[tracing::instrument(name = "update_word" skip(db_pool))]
+#[utoipa::path(
+    patch,
+    path = "/api/v1/vocabulary/{id}",
+    params(
+        ("id" = uuid::Uuid, Path, description = "UUID of the word to update"),
+    ),
+    request_body = UpdateVocabularyData,
+    responses(
+        (status = 200, description = "Word updated successfully", body = Word),
+        (status = 404, description = "Word not found"),
+        (status = 500, description = "Internal server error"),
+    ),
+    tag = "Vocabulary"
+)]
 pub async fn update_word(
     db_pool: web::Data<PgPool>,
     path: web::Path<uuid::Uuid>,
