@@ -4,6 +4,19 @@ use crate::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
 use super::detail_word_error::DetailWordError;
 
 #[tracing::instrument(name = "delete_word" skip(db_pool))]
+#[utoipa::path(
+    delete,
+    path = "/api/v1/vocabulary/{id}",
+    params(
+        ("id" = uuid::Uuid, Path, description = "UUID of the word to delete"),
+    ),
+    responses(
+        (status = 204, description = "Word deleted successfully"),
+        (status = 404, description = "Word not found"),
+        (status = 500, description = "Internal server error"),
+    ),
+    tag = "Vocabulary"
+)]
 pub async fn delete_word(
     db_pool: web::Data<PgPool>,
     path: web::Path<uuid::Uuid>,

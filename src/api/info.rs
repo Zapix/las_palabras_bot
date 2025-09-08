@@ -6,7 +6,7 @@ use tracing_attributes::instrument;
 
 use crate::configuration::Settings;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 struct Info {
     version: String,
     environment: String,
@@ -24,6 +24,15 @@ impl TryFrom<Data<Settings>> for Info {
 }
 
 #[instrument(err, skip(settings), fields(version = %settings.version))]
+#[utoipa::path(
+    get,
+    path = "/info",
+    responses(
+        (status = 200, description = "Service information", body = Info),
+        (status = 500, description = "Internal server error"),
+    ),
+    tag = "Info"
+)]
 pub async fn info(settings: Data<Settings>) -> Result<HttpResponse, actix_web::Error> {
     info!(version = %settings.version, "print info about");
     let info =

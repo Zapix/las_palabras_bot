@@ -1,10 +1,13 @@
 use std::net::TcpListener;
 
+use actix_cors::Cors;
 use actix_web::dev::Server;
 use actix_web::{App, HttpServer, web};
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
 use tracing_actix_web::TracingLogger;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::{SwaggerUi, Url};
 
 use crate::api::{health, info, vocabulary};
 use crate::configuration::Settings;
@@ -16,6 +19,20 @@ pub struct Application {
     port: u16,
     server: Server,
 }
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(
+        crate::api::health,
+        crate::api::info::info,
+        crate::api::vocabulary::create::create_word,
+        crate::api::vocabulary::list::list_words,
+        crate::api::vocabulary::detail::get_word,
+        crate::api::vocabulary::update::update_word,
+        crate::api::vocabulary::delete::delete_word,
+    ),
+)]
+struct ApiDoc;
 
 impl Application {
     pub fn new(settings: Settings) -> Result<Self, anyhow::Error> {
@@ -30,6 +47,7 @@ impl Application {
         let host = address.local_addr()?.ip().to_string();
         let server = HttpServer::new(move || {
             App::new()
+                .wrap(get_cors_middleware())
                 .wrap(TracingLogger::default())
                 .app_data(web::Data::new(settings.clone()))
                 .app_data(web::Data::new(connection_pool.clone()))
@@ -51,6 +69,12 @@ impl Application {
                                 .route(web::delete().to(vocabulary::delete_word)),
                         ),
                 )
+                .service(SwaggerUi::new("/swagger-ui/{_:.*}").urls(vec![
+                    (
+                        Url::new("api-docs", "/api-docs/openapi.json"),
+                        ApiDoc::openapi(),
+                    )
+                ]))
             // Here you can add your routes, middleware, etc.
         })
         .listen(address)?
@@ -88,4 +112,12 @@ pub fn get_connection_pool(db_settings: &DatabaseSettings) -> PgPool {
     PgPoolOptions::new()
         .max_connections(5)
         .connect_lazy_with(db_settings.with_db_name())
+}
+
+fn get_cors_middleware() -> Cors {
+    Cors::default()
+        .allow_any_origin()
+        .allow_any_method()
+        .allow_any_header()
+        .max_age(3600)
 }

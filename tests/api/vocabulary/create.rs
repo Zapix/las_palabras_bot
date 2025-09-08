@@ -14,6 +14,7 @@ async fn test_create_400_error() {
         .await
         .expect("Failed to send request");
     assert_eq!(response.status().as_u16(), 400);
+    let _ = app.drop_database().await;
 }
 
 #[tokio::test]
@@ -37,4 +38,5 @@ async fn test_create_word() {
     );
     let body = response.text().await.expect("Failed to read response text");
     assert!(body.contains("gracias") && body.contains("спасибо") && body.contains("noun"));
+    let _ = app.drop_database().await;
 }

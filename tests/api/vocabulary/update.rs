@@ -20,6 +20,7 @@ async fn update_word_returns_404_for_non_existing_word() {
         .await
         .expect("Failed to execute request.");
     assert_eq!(response.status().as_u16(), 404);
+    let _ = app.drop_database().await;
 }
 
 #[tokio::test]
@@ -65,6 +66,7 @@ async fn update_word_succeeds_for_existing_word() {
     assert_eq!(updated_word.spanish, "updated_word");
     assert_eq!(updated_word.part_of_speech, "verb".into());
     assert_eq!(updated_word.russian, "обновленное_слово");
+    let _ = app.drop_database().await;
 }
 
 #[tokio::test]
@@ -112,4 +114,5 @@ async fn update_word_verified_through_patch() {
 
     assert_eq!(updated_word.id, created_word.id);
     assert!(updated_word.is_verified);
+    let _ = app.drop_database().await;
 }
