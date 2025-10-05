@@ -1,53 +1,53 @@
 use serde::{Deserialize, Serialize};
 
-use super::raw_regular_conjucagion::RawRegularConjucagion;
+use super::raw_regular_conjugacion::RawRegularConjugacion;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Perfecto {
-    pub futuro: RawRegularConjucagion,
-    pub pasado: RawRegularConjucagion,
-    pub presente: RawRegularConjucagion,
-    pub preterito: RawRegularConjucagion,
-    pub condicional: RawRegularConjucagion,
+    pub futuro: RawRegularConjugacion,
+    pub pasado: RawRegularConjugacion,
+    pub presente: RawRegularConjugacion,
+    pub preterito: RawRegularConjugacion,
+    pub condicional: RawRegularConjugacion,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Imperativo {
-    pub negativo: RawRegularConjucagion,
-    pub afirmativo: RawRegularConjucagion,
+    pub negativo: RawRegularConjugacion,
+    pub afirmativo: RawRegularConjugacion,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Indicativo {
-    pub futuro: RawRegularConjucagion,
-    pub presente: RawRegularConjucagion,
-    pub preterito: RawRegularConjucagion,
-    pub imperfecto: RawRegularConjucagion,
-    pub condicional: RawRegularConjucagion,
+    pub futuro: RawRegularConjugacion,
+    pub presente: RawRegularConjugacion,
+    pub preterito: RawRegularConjugacion,
+    pub imperfecto: RawRegularConjugacion,
+    pub condicional: RawRegularConjugacion,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Progresivo {
-    pub futuro: RawRegularConjucagion,
-    pub presente: RawRegularConjucagion,
-    pub preterito: RawRegularConjucagion,
-    pub imperfecto: RawRegularConjucagion,
-    pub condicional: RawRegularConjucagion,
+    pub futuro: RawRegularConjugacion,
+    pub presente: RawRegularConjugacion,
+    pub preterito: RawRegularConjugacion,
+    pub imperfecto: RawRegularConjugacion,
+    pub condicional: RawRegularConjugacion,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Subjuntivo {
-    pub futuro: RawRegularConjucagion,
-    pub presente: RawRegularConjucagion,
-    pub imperfecto: RawRegularConjucagion,
-    pub imperfecto2: RawRegularConjucagion,
+    pub futuro: RawRegularConjugacion,
+    pub presente: RawRegularConjugacion,
+    pub imperfecto: RawRegularConjugacion,
+    pub imperfecto2: RawRegularConjugacion,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PerfectoSubjuntivo {
-    pub futuro: RawRegularConjucagion,
-    pub presente: RawRegularConjucagion,
-    pub pasado: RawRegularConjucagion,
+    pub futuro: RawRegularConjugacion,
+    pub presente: RawRegularConjugacion,
+    pub pasado: RawRegularConjugacion,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

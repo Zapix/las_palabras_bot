@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RawRegularConjucagion {
+pub struct RawRegularConjugacion {
     #[serde(rename = "yo")]
     pub first_person_singular: String,
 
@@ -23,7 +23,7 @@ pub struct RawRegularConjucagion {
 
 #[cfg(test)]
 mod tests {
-    use super::RawRegularConjucagion;
+    use super::RawRegularConjugacion;
 
     #[test]
     fn test_deserialize_regular_conjugation() {
@@ -37,7 +37,7 @@ mod tests {
             "ellos": "hablan"
         }
         "#;
-        let conjugation: RawRegularConjucagion = serde_json::from_str(json_data).unwrap();
+        let conjugation: RawRegularConjugacion = serde_json::from_str(json_data).unwrap();
         assert_eq!(conjugation.first_person_singular, "hablo");
         assert_eq!(conjugation.second_person_singular, "hablas");
         assert_eq!(conjugation.third_person_singular, "habla");
