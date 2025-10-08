@@ -2,22 +2,22 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RawRegularConjugacion {
-    #[serde(rename = "yo")]
+    #[serde(rename(deserialize = "yo"))]
     pub first_person_singular: String,
 
-    #[serde(rename = "tú")]
+    #[serde(rename(deserialize = "tú"))]
     pub second_person_singular: String,
 
-    #[serde(rename = "el")]
+    #[serde(rename(deserialize = "el"))]
     pub third_person_singular: String,
 
-    #[serde(rename = "nosotros")]
+    #[serde(rename(deserialize = "nosotros"))]
     pub first_person_plural: String,
 
-    #[serde(rename = "vosotros")]
+    #[serde(rename(deserialize = "vosotros"))]
     pub second_person_plural: String,
 
-    #[serde(rename = "ellos")]
+    #[serde(rename(deserialize = "ellos"))]
     pub third_person_plural: String,
 }
 
