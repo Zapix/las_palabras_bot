@@ -2,7 +2,10 @@ use clap::Parser;
 use tokio::fs::{File, try_exists};
 use tokio::io::AsyncReadExt;
 
+use las_palabras_bot::application::get_connection_pool;
+use las_palabras_bot::configuration::Settings;
 use las_palabras_bot::domain::verbs::raw_verb::RawVerb;
+use las_palabras_bot::domain::verbs::repository::{VerbsDb, VerbsRepository};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -34,5 +37,12 @@ async fn main() -> anyhow::Result<()> {
         .map_err(|e| anyhow::anyhow!("Failed to parse JSON: {}", e))?;
 
     println!("Parsed {} verbs from the verbs file.", content.len());
+
+    let settings = Settings::load().expect("Failed to load settings");
+    let connection = get_connection_pool(&settings.database);
+    let verbs_db = VerbsDb::new(&connection);
+    let new_verbs = verbs_db.add_batch_verbs(content).await?;
+
+    println!("Saved {} verbs into db", new_verbs.len());
     Ok(())
 }
