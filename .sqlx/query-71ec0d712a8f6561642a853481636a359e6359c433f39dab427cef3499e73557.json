@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id,\n               verb,\n               perfecto as \"perfecto: Json<Perfecto>\", \n               imperativo as \"imperativo: Json<Imperativo>\", \n               indicativo as \"indicativo: Json<Indicativo>\", \n               progresivo as \"progresivo: Json<Progresivo>\", \n               subjuntivo as \"subjuntivo: Json<Subjuntivo>\", \n               perfecto_subjuntivo as \"perfecto_subjuntivo: Json<PerfectoSubjuntivo>\", \n               created_at,\n               updated_at\n            FROM \"verb\"\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "verb",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "perfecto: Json<Perfecto>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 3,
+        "name": "imperativo: Json<Imperativo>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "indicativo: Json<Indicativo>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "progresivo: Json<Progresivo>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 6,
+        "name": "subjuntivo: Json<Subjuntivo>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "perfecto_subjuntivo: Json<PerfectoSubjuntivo>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "71ec0d712a8f6561642a853481636a359e6359c433f39dab427cef3499e73557"
+}

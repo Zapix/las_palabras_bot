@@ -120,7 +120,27 @@ impl<'a> VerbsRepository for VerbsDb<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn get_verb_by_id(&self, id: i32) -> Result<Option<Verb>> {
-        todo!("Not implemented yet");
+    async fn get_verb_by_id(&self, id: uuid::Uuid) -> Result<Option<Verb>> {
+        sqlx::query_as!(
+            Verb,
+            r#"
+            SELECT id,
+               verb,
+               perfecto as "perfecto: Json<Perfecto>", 
+               imperativo as "imperativo: Json<Imperativo>", 
+               indicativo as "indicativo: Json<Indicativo>", 
+               progresivo as "progresivo: Json<Progresivo>", 
+               subjuntivo as "subjuntivo: Json<Subjuntivo>", 
+               perfecto_subjuntivo as "perfecto_subjuntivo: Json<PerfectoSubjuntivo>", 
+               created_at,
+               updated_at
+            FROM "verb"
+            WHERE id = $1
+            "#,
+            id
+        )
+        .fetch_optional(self.pool)
+        .await
+        .map_err(Error::from)
     }
 }

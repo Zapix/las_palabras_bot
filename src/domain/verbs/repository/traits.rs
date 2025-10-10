@@ -19,5 +19,5 @@ pub trait VerbsRepository {
     ) -> impl Future<Output = Result<Vec<LightVerb>>> + Send;
 
     fn count_words(&self) -> impl Future<Output = Result<i64>> + Send;
-    fn get_verb_by_id(&self, id: i32) -> impl Future<Output = Result<Option<Verb>>> + Send;
+    fn get_verb_by_id(&self, id: uuid::Uuid) -> impl Future<Output = Result<Option<Verb>>> + Send;
 }
