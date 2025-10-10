@@ -94,12 +94,29 @@ impl<'a> VerbsRepository for VerbsDb<'a> {
 
     #[tracing::instrument(skip(self))]
     async fn list_verbs(&self, page: u64, per_page: u64) -> Result<Vec<LightVerb>> {
-        todo!("Not implemented yet");
+        sqlx::query_as!(
+            LightVerb,
+            r#"
+            SELECT id, verb, created_at, updated_at
+            FROM "verb"
+            ORDER BY verb
+            LIMIT $1
+            OFFSET $2
+            "#,
+            per_page as i64,
+            (page * per_page) as i64
+        )
+        .fetch_all(self.pool)
+        .await
+        .map_err(Error::from)
     }
 
     #[tracing::instrument(skip(self))]
     async fn count_words(&self) -> Result<i64> {
-        todo!("Not implemented yet");
+        sqlx::query_scalar!(r#"SELECT COUNT(*) as "count!" FROM "verb""#)
+            .fetch_one(self.pool)
+            .await
+            .map_err(Error::from)
     }
 
     #[tracing::instrument(skip(self))]
