@@ -7,6 +7,6 @@ pub struct LightVerb {
     #[serde(with = "uuid::serde::simple")]
     pub id: Uuid,
     pub verb: String,
-    pub created: NaiveDateTime,
-    pub updated: NaiveDateTime,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
 }
