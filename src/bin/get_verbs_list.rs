@@ -34,7 +34,7 @@ async fn main() -> Result<()> {
         println!("{:?}", verb);
     }
 
-    let total_count = verbs_db.count_words().await?;
+    let total_count = verbs_db.count_verbs().await?;
     let total_pages = (total_count as f64 / args.per_page as f64).ceil() as u64;
 
     println!("Total verbs: {}, Total pages: {}", total_count, total_pages);

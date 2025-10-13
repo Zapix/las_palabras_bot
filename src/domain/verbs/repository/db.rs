@@ -112,7 +112,7 @@ impl<'a> VerbsRepository for VerbsDb<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn count_words(&self) -> Result<i64> {
+    async fn count_verbs(&self) -> Result<i64> {
         sqlx::query_scalar!(r#"SELECT COUNT(*) as "count!" FROM "verb""#)
             .fetch_one(self.pool)
             .await
