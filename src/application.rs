@@ -9,7 +9,7 @@ use tracing_actix_web::TracingLogger;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{SwaggerUi, Url};
 
-use crate::api::{health, info, vocabulary};
+use crate::api::{health, info, verbs, vocabulary};
 use crate::configuration::Settings;
 use crate::configuration::database_settings::DatabaseSettings;
 
@@ -21,17 +21,16 @@ pub struct Application {
 }
 
 #[derive(OpenApi)]
-#[openapi(
-    paths(
-        crate::api::health,
-        crate::api::info::info,
-        crate::api::vocabulary::create::create_word,
-        crate::api::vocabulary::list::list_words,
-        crate::api::vocabulary::detail::get_word,
-        crate::api::vocabulary::update::update_word,
-        crate::api::vocabulary::delete::delete_word,
-    ),
-)]
+#[openapi(paths(
+    crate::api::health,
+    crate::api::info::info,
+    crate::api::vocabulary::create::create_word,
+    crate::api::vocabulary::list::list_words,
+    crate::api::vocabulary::detail::get_word,
+    crate::api::vocabulary::update::update_word,
+    crate::api::vocabulary::delete::delete_word,
+    crate::api::verbs::list::list_verbs,
+))]
 struct ApiDoc;
 
 impl Application {
@@ -67,14 +66,13 @@ impl Application {
                                 .route(web::put().to(vocabulary::update_word))
                                 .route(web::patch().to(vocabulary::update_word))
                                 .route(web::delete().to(vocabulary::delete_word)),
-                        ),
+                        )
+                        .service(web::resource("/verbs").route(web::get().to(verbs::list_verbs))),
                 )
-                .service(SwaggerUi::new("/swagger-ui/{_:.*}").urls(vec![
-                    (
-                        Url::new("api-docs", "/api-docs/openapi.json"),
-                        ApiDoc::openapi(),
-                    )
-                ]))
+                .service(SwaggerUi::new("/swagger-ui/{_:.*}").urls(vec![(
+                    Url::new("api-docs", "/api-docs/openapi.json"),
+                    ApiDoc::openapi(),
+                )]))
             // Here you can add your routes, middleware, etc.
         })
         .listen(address)?

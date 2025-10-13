@@ -6,6 +6,7 @@ use tracing_attributes::instrument;
 
 pub mod info;
 pub mod pagination;
+pub mod verbs;
 pub mod vocabulary;
 pub use info::info;
 
