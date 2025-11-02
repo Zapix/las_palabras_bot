@@ -21,11 +21,11 @@ use crate::domain::verbs::repository::{VerbsDb, VerbsRepository};
 )]
 pub async fn get_verb(
     db_pool: web::Data<PgPool>,
-    veb_id: web::Path<uuid::Uuid>,
+    verb_id: web::Path<uuid::Uuid>,
 ) -> Result<impl Responder, Error> {
     let verbs_repo = VerbsDb::new(db_pool.as_ref());
     let verb = verbs_repo
-        .get_verb_by_id(*veb_id)
+        .get_verb_by_id(*verb_id)
         .await
         .map_err(|_e| error::ErrorInternalServerError("Cannot get verb from db"))?
         .ok_or_else(|| error::ErrorNotFound("Verb not found"))?;
