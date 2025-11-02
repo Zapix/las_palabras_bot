@@ -1,15 +1,15 @@
+use super::detail_word_error::DetailWordError;
 use crate::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
 use crate::domain::vocabulary::word::Word;
 use actix_web::{HttpResponse, Responder, web};
 use sqlx::PgPool;
-use super::detail_word_error::DetailWordError;
 
 #[tracing::instrument(name = "detail_word", skip(db_pool))]
 #[utoipa::path(
     get,
     path = "/api/v1/vocabulary/{id}",
     params(
-        ("id" = uuid::Uuid, Path, description = "UUID of the word to retrieve"),
+        ("id" = String, Path, description = "UUID of the word to retrieve"),
     ),
     responses(
         (status = 200, description = "Word details", body = Word),

@@ -1,1 +1,2 @@
+mod details;
 mod list;

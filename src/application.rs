@@ -30,6 +30,7 @@ pub struct Application {
     crate::api::vocabulary::update::update_word,
     crate::api::vocabulary::delete::delete_word,
     crate::api::verbs::list::list_verbs,
+    crate::api::verbs::details::get_verb,
 ))]
 struct ApiDoc;
 
@@ -67,7 +68,10 @@ impl Application {
                                 .route(web::patch().to(vocabulary::update_word))
                                 .route(web::delete().to(vocabulary::delete_word)),
                         )
-                        .service(web::resource("/verbs").route(web::get().to(verbs::list_verbs))),
+                        .service(web::resource("/verbs").route(web::get().to(verbs::list_verbs)))
+                        .service(
+                            web::resource("/verbs/{id}").route(web::get().to(verbs::get_verb)),
+                        ),
                 )
                 .service(SwaggerUi::new("/swagger-ui/{_:.*}").urls(vec![(
                     Url::new("api-docs", "/api-docs/openapi.json"),

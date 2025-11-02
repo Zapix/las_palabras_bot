@@ -15,4 +15,6 @@ async fn test_list() {
         response.status().is_success(),
         "Expected a successful response"
     );
+
+    let _ = app.drop_database().await;
 }

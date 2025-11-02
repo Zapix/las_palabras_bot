@@ -1,14 +1,14 @@
-use actix_web::{web, HttpResponse, Responder, Error as ActixError};
-use sqlx::PgPool;
-use crate::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
 use super::detail_word_error::DetailWordError;
+use crate::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
+use actix_web::{Error as ActixError, HttpResponse, Responder, web};
+use sqlx::PgPool;
 
 #[tracing::instrument(name = "delete_word" skip(db_pool))]
 #[utoipa::path(
     delete,
     path = "/api/v1/vocabulary/{id}",
     params(
-        ("id" = uuid::Uuid, Path, description = "UUID of the word to delete"),
+        ("id" = String, Path, description = "UUID of the word to delete"),
     ),
     responses(
         (status = 204, description = "Word deleted successfully"),
@@ -35,3 +35,4 @@ pub async fn delete_word(
 
     Ok(HttpResponse::NoContent().finish())
 }
+

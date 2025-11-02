@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use super::regular_conjugacion::RegularConjugacion;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Perfecto {
     pub futuro: RegularConjugacion,
     pub pasado: RegularConjugacion,
@@ -13,13 +13,13 @@ pub struct Perfecto {
     pub condicional: RegularConjugacion,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Imperativo {
     pub negativo: RegularConjugacion,
     pub afirmativo: RegularConjugacion,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Indicativo {
     pub futuro: RegularConjugacion,
     pub presente: RegularConjugacion,
@@ -28,7 +28,7 @@ pub struct Indicativo {
     pub condicional: RegularConjugacion,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Progresivo {
     pub futuro: RegularConjugacion,
     pub presente: RegularConjugacion,
@@ -37,7 +37,7 @@ pub struct Progresivo {
     pub condicional: RegularConjugacion,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Subjuntivo {
     pub futuro: RegularConjugacion,
     pub presente: RegularConjugacion,
@@ -45,7 +45,7 @@ pub struct Subjuntivo {
     pub imperfecto2: RegularConjugacion,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct PerfectoSubjuntivo {
     pub futuro: RegularConjugacion,
     pub presente: RegularConjugacion,
