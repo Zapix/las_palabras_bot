@@ -1,9 +1,9 @@
-use actix_web::{web, HttpResponse, Responder, Error as ActixError };
-use sqlx::PgPool;
+use super::detail_word_error::DetailWordError;
+use crate::domain::vocabulary::raw_word::RawWord;
 use crate::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
 use crate::domain::vocabulary::word::Word;
-use crate::domain::vocabulary::raw_word::RawWord;
-use super::detail_word_error::DetailWordError;
+use actix_web::{Error as ActixError, HttpResponse, Responder, web};
+use sqlx::PgPool;
 
 #[derive(serde::Deserialize, Debug, utoipa::ToSchema)]
 pub struct UpdateVocabularyData {
@@ -40,7 +40,7 @@ impl UpdateVocabularyData {
     patch,
     path = "/api/v1/vocabulary/{id}",
     params(
-        ("id" = uuid::Uuid, Path, description = "UUID of the word to update"),
+        ("id" = String, Path, description = "UUID of the word to update"),
     ),
     request_body = UpdateVocabularyData,
     responses(
