@@ -111,6 +111,26 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
     }
 
     #[tracing::instrument(skip(self))]
+    async fn list_word_by_ids(&self, ids: &[uuid::Uuid]) -> Result<Vec<Word>> {
+        if ids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        sqlx::query_as!(
+            Word,
+            r#"
+                SELECT id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
+                FROM "vocabulary"
+                WHERE id = ANY($1)
+            "#,
+            ids
+        )
+        .fetch_all(self.pool)
+        .await
+        .map_err(Error::from)
+    }
+
+    #[tracing::instrument(skip(self))]
     async fn count_words(&self) -> Result<i64> {
         sqlx::query_scalar!(
             r#"
