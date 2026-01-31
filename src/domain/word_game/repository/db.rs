@@ -39,11 +39,28 @@ impl<'a> GameTrait for GameDb<'a> {
             .map_err(Error::from)
     }
 
-    /*
     async fn load_game_by_id(&mut self, id: uuid::Uuid) -> Result<Option<Game>> {
-        todo!("Load game by id");
+        sqlx::query_as!(
+            Game,
+            r#"
+            SELECT id,
+                   game_type,
+                   game_status as "game_status: Json<GameStatus>",
+                   questions_asked,
+                   correct_answers,
+                   created_at,
+                   updated_at
+            FROM "game"
+            WHERE id = $1
+            "#,
+            id
+        )
+        .fetch_optional(self.pool)
+        .await
+        .map_err(Error::from)
     }
 
+    /*
     async fn ask_question(&mut self, game_id: uuid::Uuid) -> Result<Game> {
         todo!("Ask question implementaiton");
     }
