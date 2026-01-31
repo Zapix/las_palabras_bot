@@ -1,10 +1,10 @@
 use config::Config;
-use serde::{Deserialize};
+use serde::Deserialize;
 
 use super::app_enviroment::AppEnvironment;
 use super::application_settings::ApplicationSettings;
-use super::telegram_settings::TelegramSettings;
 use super::database_settings::DatabaseSettings;
+use super::telegram_settings::TelegramSettings;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Settings {
@@ -12,7 +12,7 @@ pub struct Settings {
     environment: String,
     pub application: ApplicationSettings,
     pub telegram: TelegramSettings,
-    pub database: DatabaseSettings
+    pub database: DatabaseSettings,
 }
 
 impl Settings {

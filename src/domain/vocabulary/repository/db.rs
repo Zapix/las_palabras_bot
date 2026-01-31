@@ -63,7 +63,12 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn list_word(&self, page: u64, per_page: u64, filter: IsVerifiedFilter) -> Result<Vec<Word>> {
+    async fn list_word(
+        &self,
+        page: u64,
+        per_page: u64,
+        filter: IsVerifiedFilter,
+    ) -> Result<Vec<Word>> {
         let filter = match filter {
             IsVerifiedFilter::Any => vec![true, false],
             IsVerifiedFilter::True => vec![true],

@@ -1,5 +1,5 @@
-use secrecy::{Secret, ExposeSecret};
-use serde::{Deserialize};
+use secrecy::{ExposeSecret, Secret};
+use serde::Deserialize;
 use serde_aux::prelude::deserialize_number_from_string;
 use sqlx::postgres::{PgConnectOptions, PgSslMode};
 
@@ -15,7 +15,14 @@ pub struct DatabaseSettings {
 }
 
 impl DatabaseSettings {
-    pub fn new(username: String, password: String, port: u16, host: String, database_name: String, require_ssl: bool) -> Self {
+    pub fn new(
+        username: String,
+        password: String,
+        port: u16,
+        host: String,
+        database_name: String,
+        require_ssl: bool,
+    ) -> Self {
         Self {
             username,
             password: Secret::new(password),
@@ -40,8 +47,7 @@ impl DatabaseSettings {
     }
 
     pub fn with_db_name(&self) -> PgConnectOptions {
-        self.without_db_name()
-            .database(&self.database_name)
+        self.without_db_name().database(&self.database_name)
     }
 }
 

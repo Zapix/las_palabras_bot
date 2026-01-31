@@ -1,9 +1,9 @@
 use anyhow::Result;
 use std::future::Future;
 
+use super::filters::IsVerifiedFilter;
 use crate::domain::vocabulary::raw_word::RawWord;
 use crate::domain::vocabulary::word::Word;
-use super::filters::IsVerifiedFilter;
 
 pub trait VocabularyTrait {
     fn create_word(&self, raw_word: RawWord) -> impl Future<Output = Result<Word>> + Send;
@@ -13,8 +13,12 @@ pub trait VocabularyTrait {
         raw_words: Vec<RawWord>,
     ) -> impl Future<Output = Result<Vec<Word>>> + Send;
 
-    fn list_word(&self, page: u64, per_page: u64, filter: IsVerifiedFilter)
-    -> impl Future<Output = Result<Vec<Word>>> + Send;
+    fn list_word(
+        &self,
+        page: u64,
+        per_page: u64,
+        filter: IsVerifiedFilter,
+    ) -> impl Future<Output = Result<Vec<Word>>> + Send;
 
     fn count_words(&self) -> impl Future<Output = Result<i64>> + Send;
 

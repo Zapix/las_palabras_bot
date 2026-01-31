@@ -1,4 +1,4 @@
-use actix_web::{web::Data, HttpResponse};
+use actix_web::{HttpResponse, web::Data};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use tracing::info;
@@ -35,7 +35,6 @@ impl TryFrom<Data<Settings>> for Info {
 )]
 pub async fn info(settings: Data<Settings>) -> Result<HttpResponse, actix_web::Error> {
     info!(version = %settings.version, "print info about");
-    let info =
-        Info::try_from(settings).map_err(actix_web::error::ErrorInternalServerError)?;
+    let info = Info::try_from(settings).map_err(actix_web::error::ErrorInternalServerError)?;
     Ok(HttpResponse::Ok().json(info))
 }

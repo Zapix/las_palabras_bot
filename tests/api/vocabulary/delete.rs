@@ -1,7 +1,7 @@
 use crate::helpers::spawn_app;
-use reqwest::StatusCode;
-use las_palabras_bot::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
 use las_palabras_bot::domain::vocabulary::raw_word::RawWord;
+use las_palabras_bot::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
+use reqwest::StatusCode;
 
 #[tokio::test]
 async fn delete_word_returns_404_for_non_existing_word() {

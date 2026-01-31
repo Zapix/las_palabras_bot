@@ -99,7 +99,10 @@ async fn test_list_with_verified_filter() {
         .await
         .expect("Failed to parse JSON response");
 
-    assert!(data.total >= 1, "Expected at least 1 verified word in the response");
+    assert!(
+        data.total >= 1,
+        "Expected at least 1 verified word in the response"
+    );
     assert!(
         data.items.iter().all(|w| w.is_verified),
         "Expected all words to be verified"
