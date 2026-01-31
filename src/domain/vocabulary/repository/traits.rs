@@ -20,6 +20,8 @@ pub trait VocabularyTrait {
         filter: IsVerifiedFilter,
     ) -> impl Future<Output = Result<Vec<Word>>> + Send;
 
+    fn list_random_words(&self, limit: u64) -> impl Future<Output = Result<Vec<Word>>> + Send;
+
     fn count_words(&self) -> impl Future<Output = Result<i64>> + Send;
 
     fn get_word_by_id(&self, id: uuid::Uuid) -> impl Future<Output = Result<Option<Word>>> + Send;

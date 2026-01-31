@@ -94,6 +94,23 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
     }
 
     #[tracing::instrument(skip(self))]
+    async fn list_random_words(&self, limit: u64) -> Result<Vec<Word>> {
+        sqlx::query_as!(
+            Word,
+            r#"
+                SELECT id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
+                FROM "vocabulary"
+                ORDER BY RANDOM()
+                LIMIT $1
+            "#,
+            limit as i64
+        )
+        .fetch_all(self.pool)
+        .await
+        .map_err(Error::from)
+    }
+
+    #[tracing::instrument(skip(self))]
     async fn count_words(&self) -> Result<i64> {
         sqlx::query_scalar!(
             r#"
