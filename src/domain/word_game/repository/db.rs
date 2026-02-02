@@ -4,6 +4,7 @@ use sqlx::types::Json;
 
 use super::super::game::{Game, GameType};
 use super::super::game_status::GameStatus;
+use super::GameRepositoryError;
 use super::traits::GameTrait;
 
 pub struct GameDb<'a> {
@@ -60,11 +61,94 @@ impl<'a> GameTrait for GameDb<'a> {
         .map_err(Error::from)
     }
 
-    /*
-    async fn ask_question(&mut self, game_id: uuid::Uuid) -> Result<Game> {
-        todo!("Ask question implementaiton");
+    async fn ask_question(&mut self, game_id: uuid::Uuid) -> Result<Game, GameRepositoryError> {
+        let mut tx = self
+            .pool
+            .begin()
+            .await
+            .map_err(GameRepositoryError::DatabaseError)?;
+
+        let game = sqlx::query_as!(
+            Game,
+            r#"
+            SELECT id,
+                   game_type,
+                   game_status as "game_status: Json<GameStatus>",
+                   questions_asked,
+                   correct_answers,
+                   created_at,
+                   updated_at
+            FROM "game"
+            WHERE id = $1
+            "#,
+            game_id
+        )
+        .fetch_optional(&mut *tx)
+        .await
+        .map_err(GameRepositoryError::DatabaseError)?
+        .ok_or(GameRepositoryError::GameNotFound)?;
+
+        let game_status = game.game_status.as_ref().map(|s| s.0.clone());
+        let can_ask = matches!(
+            game_status,
+            Some(GameStatus::Initialized) | Some(GameStatus::Answered { .. })
+        );
+        if !can_ask {
+            return Err(GameRepositoryError::InvalidGameStateTransition);
+        }
+
+        let word_ids = sqlx::query_scalar!(
+            r#"
+                SELECT id
+                FROM "vocabulary"
+                ORDER BY RANDOM()
+                LIMIT 4
+            "#
+        )
+        .fetch_all(&mut *tx)
+        .await
+        .map_err(GameRepositoryError::DatabaseError)?;
+
+        let correct_word_id = match word_ids.first() {
+            Some(id) => *id,
+            None => return Err(GameRepositoryError::InvalidGameStateTransition),
+        };
+
+        let status = GameStatus::Asked {
+            word_ids,
+            correct_word_id,
+        };
+
+        let game = sqlx::query_as!(
+            Game,
+            r#"
+            UPDATE "game"
+            SET game_status = $1,
+                questions_asked = questions_asked + 1,
+                updated_at = NOW()
+            WHERE id = $2
+            RETURNING id,
+                      game_type,
+                      game_status as "game_status: Json<GameStatus>",
+                      questions_asked,
+                      correct_answers,
+                      created_at,
+                      updated_at
+            "#,
+            json!(status),
+            game_id
+        )
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(GameRepositoryError::DatabaseError)?;
+
+        tx.commit()
+            .await
+            .map_err(GameRepositoryError::DatabaseError)?;
+        Ok(game)
     }
 
+    /*
     async fn answer_question(&mut self, game_id: uuid::Uuid, answer: uuid::Uuid) -> Result<Game> {
         todo!("answer question implementaiton");
     }
