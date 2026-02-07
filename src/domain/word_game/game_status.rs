@@ -6,7 +6,6 @@ pub enum GameStatus {
     Initialized,
     Asked {
         word_ids: Vec<uuid::Uuid>,
-        #[serde(skip)]
         correct_word_id: uuid::Uuid,
     },
     Answered {

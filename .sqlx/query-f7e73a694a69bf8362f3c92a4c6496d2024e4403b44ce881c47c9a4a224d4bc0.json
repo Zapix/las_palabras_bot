@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO \"game\" (game_type, game_status, questions_asked, correct_answers, created_at, updated_at)\n            VALUES ($1, $2, 0, 0, NOW(), NOW())\n            RETURNING id,\n                      game_type,\n                      game_status as \"game_status: Json<GameStatus>\",\n                      questions_asked,\n                      correct_answers,\n                      created_at,\n                      updated_at\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "game_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "game_status: Json<GameStatus>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 3,
+        "name": "questions_asked",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "correct_answers",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "f7e73a694a69bf8362f3c92a4c6496d2024e4403b44ce881c47c9a4a224d4bc0"
+}

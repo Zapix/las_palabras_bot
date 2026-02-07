@@ -1,3 +1,4 @@
+pub mod converter;
 mod game;
 mod game_status;
 pub mod repository;

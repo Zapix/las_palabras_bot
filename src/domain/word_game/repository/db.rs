@@ -1,4 +1,5 @@
 use anyhow::{Error, Result};
+use rand::Rng;
 use serde_json::json;
 use sqlx::types::Json;
 
@@ -109,10 +110,11 @@ impl<'a> GameTrait for GameDb<'a> {
         .await
         .map_err(GameRepositoryError::DatabaseError)?;
 
-        let correct_word_id = match word_ids.first() {
-            Some(id) => *id,
-            None => return Err(GameRepositoryError::InvalidGameStateTransition),
+        let random_index = {
+            let mut rng = rand::rng();
+            rng.random_range(0..word_ids.len())
         };
+        let correct_word_id = word_ids[random_index];
 
         let status = GameStatus::Asked {
             word_ids,
