@@ -15,6 +15,7 @@ impl<'a> VocabularyDb<'a> {
     }
 }
 
+#[async_trait::async_trait]
 impl<'a> VocabularyTrait for VocabularyDb<'a> {
     #[tracing::instrument(skip(self))]
     async fn create_word(&self, raw_word: RawWord) -> Result<Word> {
