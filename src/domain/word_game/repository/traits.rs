@@ -16,13 +16,13 @@ pub trait GameTrait {
         game_id: uuid::Uuid,
     ) -> impl Future<Output = Result<Game, GameRepositoryError>> + Send;
 
-    /*
     fn answer_question(
         &mut self,
         game_id: uuid::Uuid,
         answer: uuid::Uuid,
-    ) -> impl Future<Output = Result<Game>> + Send;
+    ) -> impl Future<Output = Result<Game, GameRepositoryError>> + Send;
 
+    /*
     fn end_game(&mut self, game_id: uuid::Uuid) -> impl Future<Output = Result<Game>> + Send;
     */
 }

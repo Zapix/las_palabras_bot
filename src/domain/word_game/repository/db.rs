@@ -150,11 +150,96 @@ impl<'a> GameTrait for GameDb<'a> {
         Ok(game)
     }
 
-    /*
-    async fn answer_question(&mut self, game_id: uuid::Uuid, answer: uuid::Uuid) -> Result<Game> {
-        todo!("answer question implementaiton");
+    async fn answer_question(
+        &mut self,
+        game_id: uuid::Uuid,
+        answer: uuid::Uuid,
+    ) -> Result<Game, GameRepositoryError> {
+        let mut tx = self
+            .pool
+            .begin()
+            .await
+            .map_err(GameRepositoryError::DatabaseError)?;
+
+        let game = sqlx::query_as!(
+            Game,
+            r#"
+            SELECT id,
+                   game_type,
+                   game_status as "game_status: Json<GameStatus>",
+                   questions_asked,
+                   correct_answers,
+                   created_at,
+                   updated_at
+            FROM "game"
+            WHERE id = $1
+            "#,
+            game_id
+        )
+        .fetch_optional(&mut *tx)
+        .await
+        .map_err(GameRepositoryError::DatabaseError)?
+        .ok_or(GameRepositoryError::GameNotFound)?;
+
+        let Some(GameStatus::Asked {
+            word_ids,
+            correct_word_id,
+        }) = game.game_status.as_ref().map(|status| status.0.clone())
+        else {
+            return Err(GameRepositoryError::InvalidGameStateTransition);
+        };
+
+        let is_correct = answer == correct_word_id;
+        let status = GameStatus::Answered {
+            word_ids,
+            correct_word_id,
+            is_correct,
+        };
+        let correct_answers_increment = i32::from(is_correct);
+
+        sqlx::query(
+            r#"
+            UPDATE "game"
+            SET game_status = $1,
+                correct_answers = correct_answers + $2,
+                updated_at = NOW()
+            WHERE id = $3
+            "#,
+        )
+        .bind(json!(status))
+        .bind(correct_answers_increment)
+        .bind(game_id)
+        .execute(&mut *tx)
+        .await
+        .map_err(GameRepositoryError::DatabaseError)?;
+
+        let game = sqlx::query_as!(
+            Game,
+            r#"
+            SELECT id,
+                   game_type,
+                   game_status as "game_status: Json<GameStatus>",
+                   questions_asked,
+                   correct_answers,
+                   created_at,
+                   updated_at
+            FROM "game"
+            WHERE id = $1
+            "#,
+            game_id
+        )
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(GameRepositoryError::DatabaseError)?;
+
+        tx.commit()
+            .await
+            .map_err(GameRepositoryError::DatabaseError)?;
+
+        Ok(game)
     }
 
+    /*
     async fn end_game(&mut self, game_id: uuid::Uuid) -> Result<Game> {
         todo!("end game implementaiton");
     }
