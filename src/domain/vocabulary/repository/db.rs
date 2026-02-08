@@ -15,6 +15,7 @@ impl<'a> VocabularyDb<'a> {
     }
 }
 
+#[async_trait::async_trait]
 impl<'a> VocabularyTrait for VocabularyDb<'a> {
     #[tracing::instrument(skip(self))]
     async fn create_word(&self, raw_word: RawWord) -> Result<Word> {
@@ -63,7 +64,12 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
     }
 
     #[tracing::instrument(skip(self))]
-    async fn list_word(&self, page: u64, per_page: u64, filter: IsVerifiedFilter) -> Result<Vec<Word>> {
+    async fn list_word(
+        &self,
+        page: u64,
+        per_page: u64,
+        filter: IsVerifiedFilter,
+    ) -> Result<Vec<Word>> {
         let filter = match filter {
             IsVerifiedFilter::Any => vec![true, false],
             IsVerifiedFilter::True => vec![true],
@@ -82,6 +88,43 @@ impl<'a> VocabularyTrait for VocabularyDb<'a> {
             &filter,
             (page * per_page) as i64,
             per_page as i64
+        )
+        .fetch_all(self.pool)
+        .await
+        .map_err(Error::from)
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn list_random_words(&self, limit: u64) -> Result<Vec<Word>> {
+        sqlx::query_as!(
+            Word,
+            r#"
+                SELECT id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
+                FROM "vocabulary"
+                ORDER BY RANDOM()
+                LIMIT $1
+            "#,
+            limit as i64
+        )
+        .fetch_all(self.pool)
+        .await
+        .map_err(Error::from)
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn list_word_by_ids(&self, ids: &[uuid::Uuid]) -> Result<Vec<Word>> {
+        if ids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        sqlx::query_as!(
+            Word,
+            r#"
+                SELECT id, spanish, russian, part_of_speech, is_verified, created_at, updated_at
+                FROM "vocabulary"
+                WHERE id = ANY($1)
+            "#,
+            ids
         )
         .fetch_all(self.pool)
         .await

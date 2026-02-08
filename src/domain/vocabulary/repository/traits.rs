@@ -1,32 +1,33 @@
 use anyhow::Result;
-use std::future::Future;
 
+use super::filters::IsVerifiedFilter;
 use crate::domain::vocabulary::raw_word::RawWord;
 use crate::domain::vocabulary::word::Word;
-use super::filters::IsVerifiedFilter;
 
+#[async_trait::async_trait]
 pub trait VocabularyTrait {
-    fn create_word(&self, raw_word: RawWord) -> impl Future<Output = Result<Word>> + Send;
+    async fn create_word(&self, raw_word: RawWord) -> Result<Word>;
 
-    fn create_batch_words(
+    async fn create_batch_words(&self, raw_words: Vec<RawWord>) -> Result<Vec<Word>>;
+
+    async fn list_word(
         &self,
-        raw_words: Vec<RawWord>,
-    ) -> impl Future<Output = Result<Vec<Word>>> + Send;
+        page: u64,
+        per_page: u64,
+        filter: IsVerifiedFilter,
+    ) -> Result<Vec<Word>>;
 
-    fn list_word(&self, page: u64, per_page: u64, filter: IsVerifiedFilter)
-    -> impl Future<Output = Result<Vec<Word>>> + Send;
+    async fn list_random_words(&self, limit: u64) -> Result<Vec<Word>>;
 
-    fn count_words(&self) -> impl Future<Output = Result<i64>> + Send;
+    async fn list_word_by_ids(&self, ids: &[uuid::Uuid]) -> Result<Vec<Word>>;
 
-    fn get_word_by_id(&self, id: uuid::Uuid) -> impl Future<Output = Result<Option<Word>>> + Send;
+    async fn count_words(&self) -> Result<i64>;
 
-    fn verify_word(&self, id: uuid::Uuid) -> impl Future<Output = Result<Word>> + Send;
+    async fn get_word_by_id(&self, id: uuid::Uuid) -> Result<Option<Word>>;
 
-    fn update_word(
-        &self,
-        id: uuid::Uuid,
-        raw_word: RawWord,
-    ) -> impl Future<Output = Result<Word>> + Send;
+    async fn verify_word(&self, id: uuid::Uuid) -> Result<Word>;
 
-    fn delete_word(&self, id: uuid::Uuid) -> impl Future<Output = Result<()>> + Send;
+    async fn update_word(&self, id: uuid::Uuid, raw_word: RawWord) -> Result<Word>;
+
+    async fn delete_word(&self, id: uuid::Uuid) -> Result<()>;
 }

@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id,\n                   game_type,\n                   game_status as \"game_status: Json<GameStatus>\",\n                   questions_asked,\n                   correct_answers,\n                   created_at,\n                   updated_at\n            FROM \"game\"\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "game_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "game_status: Json<GameStatus>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 3,
+        "name": "questions_asked",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "correct_answers",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "13884c0828c747f29a441f10d502cbe6f23a3a5fa6ce5d0edbc6c5b6fd845707"
+}

@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 use las_palabras_bot::application::get_connection_pool;
-use las_palabras_bot::configuration::{Settings, DatabaseSettings};
+use las_palabras_bot::configuration::{DatabaseSettings, Settings};
 use log::info;
 use secrecy::ExposeSecret;
 use sqlx::{Connection, PgConnection, PgPool};
@@ -47,11 +47,11 @@ impl TestApp {
                 "DROP DATABASE IF EXISTS {} WITH (FORCE);",
                 self.settings.database.database_name
             )
-                .as_str(),
+            .as_str(),
         )
-            .execute(&mut connection)
-            .await
-            .map_err(|e| anyhow::anyhow!("Failed to drop test database: {}", e))?;
+        .execute(&mut connection)
+        .await
+        .map_err(|e| anyhow::anyhow!("Failed to drop test database: {}", e))?;
         info!(
             "Test database {} dropped",
             self.settings.database.database_name

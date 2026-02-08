@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT id, spanish, russian, part_of_speech, is_verified, created_at, updated_at\n                FROM \"vocabulary\"\n                ORDER BY RANDOM()\n                LIMIT $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "spanish",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "russian",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "part_of_speech",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "is_verified",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "a376cfbcc2133bb77b24ff2c1ea081939fa8214707b86791cc12c8201b33450d"
+}

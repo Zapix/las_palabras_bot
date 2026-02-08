@@ -1,6 +1,6 @@
 use crate::domain::vocabulary::raw_word::RawWord;
-use crate::domain::vocabulary::word::Word;
 use crate::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
+use crate::domain::vocabulary::word::Word;
 use actix_web::{HttpResponse, Responder, error, web};
 use sqlx::PgPool;
 

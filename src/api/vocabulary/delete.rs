@@ -35,4 +35,3 @@ pub async fn delete_word(
 
     Ok(HttpResponse::NoContent().finish())
 }
-

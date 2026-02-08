@@ -1,7 +1,7 @@
 pub mod db;
-pub mod traits;
 mod filters;
+pub mod traits;
 
 pub use db::VocabularyDb;
-pub use traits::VocabularyTrait;
 pub use filters::IsVerifiedFilter;
+pub use traits::VocabularyTrait;

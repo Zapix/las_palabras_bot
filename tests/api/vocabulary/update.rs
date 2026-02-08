@@ -1,7 +1,7 @@
 use crate::helpers::spawn_app;
+use las_palabras_bot::domain::vocabulary::raw_word::RawWord;
 use las_palabras_bot::domain::vocabulary::repository::{VocabularyDb, VocabularyTrait};
 use las_palabras_bot::domain::vocabulary::word::Word;
-use las_palabras_bot::domain::vocabulary::raw_word::RawWord;
 
 #[tokio::test]
 async fn update_word_returns_404_for_non_existing_word() {
@@ -13,7 +13,10 @@ async fn update_word_returns_404_for_non_existing_word() {
         "russian": "обновленное_слово"
     });
     let response = client
-        .put(format!("{}/api/v1/vocabulary/9ed64d96-8342-478f-aa1f-c23f9c61d9c7", &app.address()))
+        .put(format!(
+            "{}/api/v1/vocabulary/9ed64d96-8342-478f-aa1f-c23f9c61d9c7",
+            &app.address()
+        ))
         .header("Content-Type", "application/json")
         .json(&new_word)
         .send()
@@ -46,7 +49,11 @@ async fn update_word_succeeds_for_existing_word() {
         "russian": "обновленное_слово"
     });
     let response = client
-        .put(format!("{}/api/v1/vocabulary/{}", &app.address(), created_word.id))
+        .put(format!(
+            "{}/api/v1/vocabulary/{}",
+            &app.address(),
+            created_word.id
+        ))
         .header("Content-Type", "application/json")
         .json(&new_word)
         .send()
