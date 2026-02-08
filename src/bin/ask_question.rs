@@ -11,7 +11,7 @@ use las_palabras_bot::domain::word_game::repository::{GameDb, GameTrait};
 #[command(version, about, long_about = None)]
 struct Args {
     #[arg(short, long, value_name = "UUID")]
-    id: uuid::Uuid,
+    game_id: uuid::Uuid,
     #[arg(short, long, default_value_t = false)]
     debug: bool,
 }
@@ -24,11 +24,11 @@ async fn main() -> Result<()> {
     let db_pool = get_connection_pool(&settings.database);
     let mut game_db = GameDb::new(&db_pool);
 
-    let game = game_db.ask_question(args.id).await?;
+    let game = game_db.ask_question(args.game_id).await?;
     if args.debug {
         println!("{:?}", game);
     } else {
-        println!("Question asked for game {}", args.id);
+        println!("Question asked for game {}", args.game_id);
         let vocabulary_db = VocabularyDb::new(&db_pool);
         let converter = Converter::new(&vocabulary_db);
         println!("{:?}", converter.convert_game_to_output(&game).await?);
