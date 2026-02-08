@@ -22,7 +22,8 @@ pub trait GameTrait {
         answer: uuid::Uuid,
     ) -> impl Future<Output = Result<Game, GameRepositoryError>> + Send;
 
-    /*
-    fn end_game(&mut self, game_id: uuid::Uuid) -> impl Future<Output = Result<Game>> + Send;
-    */
+    fn end_game(
+        &mut self,
+        game_id: uuid::Uuid,
+    ) -> impl Future<Output = Result<Game, GameRepositoryError>> + Send;
 }

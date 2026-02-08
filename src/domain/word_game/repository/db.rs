@@ -239,9 +239,78 @@ impl<'a> GameTrait for GameDb<'a> {
         Ok(game)
     }
 
-    /*
-    async fn end_game(&mut self, game_id: uuid::Uuid) -> Result<Game> {
-        todo!("end game implementaiton");
+    async fn end_game(&mut self, game_id: uuid::Uuid) -> Result<Game, GameRepositoryError> {
+        let mut tx = self
+            .pool
+            .begin()
+            .await
+            .map_err(GameRepositoryError::DatabaseError)?;
+
+        let game = sqlx::query_as!(
+            Game,
+            r#"
+            SELECT id,
+                   game_type,
+                   game_status as "game_status: Json<GameStatus>",
+                   questions_asked,
+                   correct_answers,
+                   created_at,
+                   updated_at
+            FROM "game"
+            WHERE id = $1
+            "#,
+            game_id
+        )
+        .fetch_optional(&mut *tx)
+        .await
+        .map_err(GameRepositoryError::DatabaseError)?
+        .ok_or(GameRepositoryError::GameNotFound)?;
+
+        let can_end = matches!(
+            game.game_status.as_ref().map(|status| status.0.clone()),
+            Some(GameStatus::Initialized) | Some(GameStatus::Answered { .. })
+        );
+        if !can_end {
+            return Err(GameRepositoryError::InvalidGameStateTransition);
+        }
+
+        sqlx::query(
+            r#"
+            UPDATE "game"
+            SET game_status = $1,
+                updated_at = NOW()
+            WHERE id = $2
+            "#,
+        )
+        .bind(json!(GameStatus::Ended))
+        .bind(game_id)
+        .execute(&mut *tx)
+        .await
+        .map_err(GameRepositoryError::DatabaseError)?;
+
+        let game = sqlx::query_as!(
+            Game,
+            r#"
+            SELECT id,
+                   game_type,
+                   game_status as "game_status: Json<GameStatus>",
+                   questions_asked,
+                   correct_answers,
+                   created_at,
+                   updated_at
+            FROM "game"
+            WHERE id = $1
+            "#,
+            game_id
+        )
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(GameRepositoryError::DatabaseError)?;
+
+        tx.commit()
+            .await
+            .map_err(GameRepositoryError::DatabaseError)?;
+
+        Ok(game)
     }
-    */
 }
