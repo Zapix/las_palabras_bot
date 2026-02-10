@@ -9,7 +9,7 @@ use tracing_actix_web::TracingLogger;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{SwaggerUi, Url};
 
-use crate::api::{health, info, verbs, vocabulary};
+use crate::api::{games, health, info, verbs, vocabulary};
 use crate::configuration::Settings;
 use crate::configuration::database_settings::DatabaseSettings;
 
@@ -31,6 +31,7 @@ pub struct Application {
     crate::api::vocabulary::delete::delete_word,
     crate::api::verbs::list::list_verbs,
     crate::api::verbs::details::get_verb,
+    crate::api::games::create::create_game,
 ))]
 struct ApiDoc;
 
@@ -69,9 +70,8 @@ impl Application {
                                 .route(web::delete().to(vocabulary::delete_word)),
                         )
                         .service(web::resource("/verbs").route(web::get().to(verbs::list_verbs)))
-                        .service(
-                            web::resource("/verbs/{id}").route(web::get().to(verbs::get_verb)),
-                        ),
+                        .service(web::resource("/verbs/{id}").route(web::get().to(verbs::get_verb)))
+                        .service(web::resource("/games").route(web::post().to(games::create_game))),
                 )
                 .service(SwaggerUi::new("/swagger-ui/{_:.*}").urls(vec![(
                     Url::new("api-docs", "/api-docs/openapi.json"),

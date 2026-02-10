@@ -4,6 +4,7 @@ use sqlx::PgPool;
 use tracing::info;
 use tracing_attributes::instrument;
 
+pub mod games;
 pub mod info;
 pub mod pagination;
 pub mod verbs;
