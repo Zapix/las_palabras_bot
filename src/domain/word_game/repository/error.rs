@@ -6,6 +6,8 @@ pub enum GameRepositoryError {
     DatabaseError(#[from] sqlx::Error),
     #[error("Game not found")]
     GameNotFound,
+    #[error("No words available")]
+    NoWordsAvailable,
     #[error("Invalid game state transition")]
     InvalidGameStateTransition,
 }

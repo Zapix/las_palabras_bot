@@ -33,6 +33,7 @@ pub struct Application {
     crate::api::verbs::details::get_verb,
     crate::api::games::create::create_game,
     crate::api::games::detail::get_game,
+    crate::api::games::ask_question::ask_question,
 ))]
 struct ApiDoc;
 
@@ -73,8 +74,10 @@ impl Application {
                         .service(web::resource("/verbs").route(web::get().to(verbs::list_verbs)))
                         .service(web::resource("/verbs/{id}").route(web::get().to(verbs::get_verb)))
                         .service(web::resource("/games").route(web::post().to(games::create_game)))
+                        .service(web::resource("/games/{id}").route(web::get().to(games::get_game)))
                         .service(
-                            web::resource("/games/{id}").route(web::get().to(games::get_game)),
+                            web::resource("/games/{id}/questions")
+                                .route(web::post().to(games::ask_question)),
                         ),
                 )
                 .service(SwaggerUi::new("/swagger-ui/{_:.*}").urls(vec![(

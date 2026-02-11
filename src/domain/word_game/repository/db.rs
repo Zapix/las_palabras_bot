@@ -110,6 +110,10 @@ impl<'a> GameTrait for GameDb<'a> {
         .await
         .map_err(GameRepositoryError::DatabaseError)?;
 
+        if word_ids.is_empty() {
+            return Err(GameRepositoryError::NoWordsAvailable);
+        }
+
         let random_index = {
             let mut rng = rand::rng();
             rng.random_range(0..word_ids.len())
