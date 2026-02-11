@@ -1,5 +1,6 @@
 use chrono::NaiveDateTime;
 use serde::Serialize;
+use serde_json::Value;
 use uuid::Uuid;
 
 use crate::domain::word_game::converter::{GameOutput, GameStatusOutput};
@@ -11,6 +12,7 @@ pub struct GameResponse {
     pub id: Uuid,
     pub game_type: String,
     pub status: String,
+    pub state: Value,
     pub questions_asked: i32,
     pub correct_answers: i32,
     pub created_at: NaiveDateTime,
@@ -19,18 +21,20 @@ pub struct GameResponse {
 
 impl From<GameOutput> for GameResponse {
     fn from(value: GameOutput) -> Self {
-        let status = match value.game_status {
+        let status = match &value.game_status {
             GameStatusOutput::Initialized => "Initialized",
             GameStatusOutput::Asked { .. } => "Asked",
             GameStatusOutput::Answered { .. } => "Answered",
             GameStatusOutput::Ended => "Ended",
         }
         .to_string();
+        let state = serde_json::to_value(&value.game_status).unwrap_or_default();
 
         Self {
             id: value.id,
             game_type: value.game_type.to_string(),
             status,
+            state,
             questions_asked: value.questions_asked,
             correct_answers: value.correct_answers,
             created_at: value.created_at,
@@ -76,6 +80,10 @@ mod tests {
         assert_eq!(response.id, output.id);
         assert_eq!(response.game_type, "RussianToSpanish");
         assert_eq!(response.status, "Initialized");
+        assert_eq!(
+            response.state.get("status").and_then(|v| v.as_str()),
+            Some("Initialized")
+        );
         assert_eq!(response.questions_asked, output.questions_asked);
         assert_eq!(response.correct_answers, output.correct_answers);
         assert_eq!(response.created_at, output.created_at);
@@ -92,6 +100,22 @@ mod tests {
         let response = GameResponse::from(output);
 
         assert_eq!(response.status, "Asked");
+        assert_eq!(
+            response.state.get("status").and_then(|v| v.as_str()),
+            Some("Asked")
+        );
+        assert_eq!(
+            response.state.get("question").and_then(|v| v.as_str()),
+            Some("привет")
+        );
+        assert_eq!(
+            response
+                .state
+                .get("variants")
+                .and_then(|v| v.as_array())
+                .map(std::vec::Vec::len),
+            Some(1)
+        );
     }
 
     #[test]
@@ -101,6 +125,14 @@ mod tests {
         let response = GameResponse::from(output);
 
         assert_eq!(response.status, "Answered");
+        assert_eq!(
+            response.state.get("status").and_then(|v| v.as_str()),
+            Some("Answered")
+        );
+        assert_eq!(
+            response.state.get("is_correct").and_then(|v| v.as_bool()),
+            Some(true)
+        );
     }
 
     #[test]
@@ -110,5 +142,9 @@ mod tests {
         let response = GameResponse::from(output);
 
         assert_eq!(response.status, "Ended");
+        assert_eq!(
+            response.state.get("status").and_then(|v| v.as_str()),
+            Some("Ended")
+        );
     }
 }
