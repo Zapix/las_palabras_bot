@@ -10,7 +10,7 @@ async fn delete_word_returns_404_for_non_existing_word() {
     let response = client
         .delete(format!(
             "{}/api/v1/vocabulary/9ed64d96-8342-478f-aa1f-c23f9c61d9c7",
-            &app.address()
+            app.address()
         ))
         .send()
         .await
@@ -38,7 +38,7 @@ async fn delete_word_succeeds_for_existing_word() {
     let response = client
         .delete(format!(
             "{}/api/v1/vocabulary/{}",
-            &app.address(),
+            app.address(),
             created_word.id
         ))
         .send()
