@@ -224,3 +224,25 @@ async fn test_answer_question_409_when_already_answered() {
     assert_eq!(second_response.status().as_u16(), 409);
     let _ = app.drop_database().await;
 }
+
+#[tokio::test]
+async fn test_concurrent_answer_question_only_accepts_one_answer() {
+    let mut app = spawn_app().await.expect("Failed to spawn app");
+    seed_words(&mut app).await;
+    let game_id = create_game(&app).await;
+    ask_question(&app, &game_id).await;
+    let (correct, _) = load_asked_word_ids(&mut app, &game_id).await;
+
+    let (first_response, second_response) = tokio::join!(
+        answer_question(&app, &game_id, correct),
+        answer_question(&app, &game_id, correct)
+    );
+
+    let mut statuses = [
+        first_response.status().as_u16(),
+        second_response.status().as_u16(),
+    ];
+    statuses.sort_unstable();
+    assert_eq!(statuses, [200, 409]);
+    let _ = app.drop_database().await;
+}

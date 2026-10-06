@@ -165,6 +165,13 @@ impl<'a> GameTrait for GameDb<'a> {
             .await
             .map_err(GameRepositoryError::DatabaseError)?;
 
+        sqlx::query(r#"SELECT id FROM "game" WHERE id = $1 FOR UPDATE"#)
+            .bind(game_id)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(GameRepositoryError::DatabaseError)?
+            .ok_or(GameRepositoryError::GameNotFound)?;
+
         let game = sqlx::query_as!(
             Game,
             r#"
