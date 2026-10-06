@@ -34,6 +34,7 @@ pub struct Application {
     crate::api::games::create::create_game,
     crate::api::games::detail::get_game,
     crate::api::games::ask_question::ask_question,
+    crate::api::games::answer_question::answer_question,
 ))]
 struct ApiDoc;
 
@@ -78,6 +79,10 @@ impl Application {
                         .service(
                             web::resource("/games/{id}/questions")
                                 .route(web::post().to(games::ask_question)),
+                        )
+                        .service(
+                            web::resource("/games/{id}/answers")
+                                .route(web::post().to(games::answer_question)),
                         ),
                 )
                 .service(SwaggerUi::new("/swagger-ui/{_:.*}").urls(vec![(

@@ -130,7 +130,7 @@ mod tests {
             Some("Answered")
         );
         assert_eq!(
-            response.state.get("is_correct").and_then(|v| v.as_bool()),
+            response.state.get("isCorrect").and_then(|v| v.as_bool()),
             Some(true)
         );
     }
