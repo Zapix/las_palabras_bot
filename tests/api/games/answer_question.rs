@@ -167,7 +167,7 @@ async fn test_answer_question_200_for_correct_answer() {
     );
     assert_eq!(
         body.get("state")
-            .and_then(|v| v.get("is_correct"))
+            .and_then(|v| v.get("isCorrect"))
             .and_then(|v| v.as_bool()),
         Some(true)
     );
@@ -198,7 +198,7 @@ async fn test_answer_question_200_for_incorrect_answer() {
     );
     assert_eq!(
         body.get("state")
-            .and_then(|v| v.get("is_correct"))
+            .and_then(|v| v.get("isCorrect"))
             .and_then(|v| v.as_bool()),
         Some(false)
     );

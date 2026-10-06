@@ -23,6 +23,7 @@ pub enum GameStatusOutput {
         question: String,
     },
     Answered {
+        #[serde(rename = "isCorrect")]
         is_correct: bool,
     },
     Ended,
