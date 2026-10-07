@@ -196,3 +196,41 @@ async fn test_end_game_409_when_already_ended() {
     assert_eq!(second_response.status().as_u16(), 409);
     let _ = app.drop_database().await;
 }
+
+#[tokio::test]
+async fn test_end_game_concurrent_requests_only_one_succeeds() {
+    const ROUNDS: usize = 5;
+    const CONCURRENT_REQUESTS: usize = 5;
+    let app = spawn_app().await.expect("Failed to spawn app");
+
+    for _ in 0..ROUNDS {
+        let game_id = create_game(&app).await;
+
+        let url = format!("{}/api/v1/games/{}/end", app.address(), game_id);
+        let mut requests = tokio::task::JoinSet::new();
+        for _ in 0..CONCURRENT_REQUESTS {
+            let client = app.api_client().clone();
+            let url = url.clone();
+            requests.spawn(async move {
+                client
+                    .post(url)
+                    .send()
+                    .await
+                    .expect("Failed to send end request")
+                    .status()
+                    .as_u16()
+            });
+        }
+        let statuses = requests.join_all().await;
+
+        let ok_count = statuses.iter().filter(|s| **s == 200).count();
+        let conflict_count = statuses.iter().filter(|s| **s == 409).count();
+        assert_eq!(
+            ok_count, 1,
+            "exactly one concurrent end request should succeed"
+        );
+        assert_eq!(conflict_count, CONCURRENT_REQUESTS - 1);
+    }
+
+    let _ = app.drop_database().await;
+}
