@@ -269,6 +269,7 @@ impl<'a> GameTrait for GameDb<'a> {
                    updated_at
             FROM "game"
             WHERE id = $1
+            FOR UPDATE
             "#,
             game_id
         )
